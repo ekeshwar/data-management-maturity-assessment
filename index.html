@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Management Assessment</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f2f7;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #1a2b4a;
+      color: #fff;
+      padding: 22px 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    header h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    header p {
+      font-size: 0.88rem;
+      opacity: 0.75;
+      margin-top: 4px;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 860px;
+      margin: 36px auto;
+      padding: 0 16px 48px;
+    }
+
+    /* ── Tab bar ── */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0;
+      border-bottom: 3px solid #1a2b4a;
+    }
+    .tab-btn {
+      padding: 12px 30px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: #dde2ed;
+      color: #4a5568;
+      border-radius: 8px 8px 0 0;
+      margin-right: 4px;
+      transition: background 0.18s, color 0.18s;
+      outline: none;
+    }
+    .tab-btn:hover { background: #c5cde0; }
+    .tab-btn.active {
+      background: #1a2b4a;
+      color: #fff;
+    }
+
+    /* ── Tab panel ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Question card ── */
+    .question-card {
+      background: #fff;
+      border-radius: 0 10px 10px 10px;
+      box-shadow: 0 2px 12px rgba(26,43,74,0.09);
+      padding: 28px 32px 24px;
+      margin-bottom: 0;
+    }
+    .section-intro {
+      font-size: 0.9rem;
+      color: #556;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ── Single question ── */
+    .question-block {
+      margin-bottom: 26px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid #eaecf2;
+    }
+    .question-block:last-of-type { border-bottom: none; margin-bottom: 8px; }
+
+    .question-label {
+      font-size: 0.97rem;
+      font-weight: 600;
+      color: #1a2b4a;
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+    .question-number {
+      display: inline-block;
+      background: #1a2b4a;
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ── Pill radio row ── */
+    .options-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .options-row input[type="radio"] { display: none; }
+    .options-row label {
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+      padding: 8px 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      border: 2px solid #c8cedc;
+      border-radius: 24px;
+      cursor: pointer;
+      color: #455;
+      background: #f7f8fc;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      user-select: none;
+      line-height: 1.3;
+    }
+    .options-row label:hover {
+      border-color: #3b72d4;
+      background: #eef3fd;
+      color: #1a2b4a;
+    }
+    .options-row input[type="radio"]:checked + label {
+      border-color: #1a2b4a;
+      background: #1a2b4a;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* ── Submit button ── */
+    .submit-wrap {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+    .btn-submit {
+      background: #1a2b4a;
+      color: #fff;
+      border: none;
+      padding: 12px 38px;
+      font-size: 0.97rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: background 0.18s;
+    }
+    .btn-submit:hover { background: #24407a; }
+
+    /* ── Validation message ── */
+    .validation-msg {
+      color: #c0392b;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 10px;
+      display: none;
+      text-align: right;
+    }
+
+    /* ── Result panel ── */
+    .result-panel {
+      display: none;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(26,43,74,0.12);
+      padding: 28px 32px;
+      margin-top: 20px;
+    }
+    .result-panel.visible { display: block; }
+
+    .result-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1a2b4a;
+      margin-bottom: 18px;
+    }
+
+    /* Score bar */
+    .score-bar-wrap {
+      background: #eaecf2;
+      border-radius: 8px;
+      height: 22px;
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 8px;
+      width: 0%;
+      transition: width 0.8s cubic-bezier(.4,0,.2,1);
+    }
+
+    .score-line {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .score-value {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #1a2b4a;
+    }
+    .maturity-badge {
+      display: inline-block;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+
+    .recommendation {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #334;
+      background: #f7f8fc;
+      border-left: 4px solid #1a2b4a;
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* Scale legend */
+    .scale-legend {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      margin-bottom: 20px;
+      font-size: 0.72rem;
+      color: #667;
+    }
+    .scale-legend span { opacity: 0.75; }
+
+    @media (max-width: 600px) {
+      header { padding: 16px 16px; }
+      .question-card { padding: 18px 14px; }
+      .result-panel { padding: 20px 14px; }
+      .options-row label { font-size: 0.7rem; padding: 7px 4px; min-width: 80px; }
+      .tab-btn { padding: 10px 14px; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Data Management Assessment</h1>
+  <p>Evaluate your organisation's data maturity across key domains</p>
+</header>
+
+<div class="container">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('governance', this)">Data Governance</button>
+    <button class="tab-btn" onclick="switchTab('quality', this)">Data Quality</button>
+  </div>
+
+  <!-- ═══════════════════ TAB 1: DATA GOVERNANCE ═══════════════════ -->
+  <div class="tab-panel active" id="panel-governance">
+    <div class="question-card">
+      <p class="section-intro">
+        Answer each question below by selecting the option that best reflects your organisation's current state.
+        All 7 questions must be answered before submitting.
+      </p>
+
+      <div class="scale-legend">
+        <span>Scale: </span>
+        <span>1 — Not at all &nbsp;|&nbsp;</span>
+        <span>2 — Ad-hoc / Informal &nbsp;|&nbsp;</span>
+        <span>3 — Partially in place &nbsp;|&nbsp;</span>
+        <span>4 — Largely in place &nbsp;|&nbsp;</span>
+        <span>5 — Fully implemented</span>
+      </div>
+
+      <form id="form-governance">
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">1</span>
+            Does your organisation have a formally documented data governance policy?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="g1" id="g1-1" value="1"><label for="g1-1">Not at all</label>
+            <input type="radio" name="g1" id="g1-2" value="2"><label for="g1-2">Ad-hoc / Informal</label>
+            <input type="radio" name="g1" id="g1-3" value="3"><label for="g1-3">Partially in place</label>
+            <input type="radio" name="g1" id="g1-4" value="4"><label for="g1-4">Largely in place</label>
+            <input type="radio" name="g1" id="g1-5" value="5"><label for="g1-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">2</span>
+            Is there a designated Data Governance Council or steering committee?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="g2" id="g2-1" value="1"><label for="g2-1">Not at all</label>
+            <input type="radio" name="g2" id="g2-2" value="2"><label for="g2-2">Ad-hoc / Informal</label>
+            <input type="radio" name="g2" id="g2-3" value="3"><label for="g2-3">Partially in place</label>
+            <input type="radio" name="g2" id="g2-4" value="4"><label for="g2-4">Largely in place</label>
+            <input type="radio" name="g2" id="g2-5" value="5"><label for="g2-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">3</span>
+            Are data owners and stewards formally assigned for critical data assets?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="g3" id="g3-1" value="1"><label for="g3-1">Not at all</label>
+            <input type="radio" name="g3" id="g3-2" value="2"><label for="g3-2">Ad-hoc / Informal</label>
+            <input type="radio" name="g3" id="g3-3" value="3"><label for="g3-3">Partially in place</label>
+            <input type="radio" name="g3" id="g3-4" value="4"><label for="g3-4">Largely in place</label>
+            <input type="radio" name="g3" id="g3-5" value="5"><label for="g3-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">4</span>
+            Are data governance policies communicated and enforced across business units?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="g4" id="g4-1" value="1"><label for="g4-1">Not at all</label>
+            <input type="radio" name="g4" id="g4-2" value="2"><label for="g4-2">Ad-hoc / Informal</label>
+            <input type="radio" name="g4" id="g4-3" value="3"><label for="g4-3">Partially in place</label>
+            <input type="radio" name="g4" id="g4-4" value="4"><label for="g4-4">Largely in place</label>
+            <input type="radio" name="g4" id="g4-5" value="5"><label for="g4-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">5</span>
+            Is there a defined process for resolving data ownership disputes or issues?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="g5" id="g5-1" value="1"><label for="g5-1">Not at all</label>
+            <input type="radio" name="g5" id="g5-2" value="2"><label for="g5-2">Ad-hoc / Informal</label>
+            <input type="radio" name="g5" id="g5-3" value="3"><label for="g5-3">Partially in place</label>
+            <input type="radio" name="g5" id="g5-4" value="4"><label for="g5-4">Largely in place</label>
+            <input type="radio" name="g5" id="g5-5" value="5"><label for="g5-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">6</span>
+            Are regulatory and compliance requirements (e.g. GDPR, local laws) tracked for data assets?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="g6" id="g6-1" value="1"><label for="g6-1">Not at all</label>
+            <input type="radio" name="g6" id="g6-2" value="2"><label for="g6-2">Ad-hoc / Informal</label>
+            <input type="radio" name="g6" id="g6-3" value="3"><label for="g6-3">Partially in place</label>
+            <input type="radio" name="g6" id="g6-4" value="4"><label for="g6-4">Largely in place</label>
+            <input type="radio" name="g6" id="g6-5" value="5"><label for="g6-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">7</span>
+            Are data governance outcomes measured using KPIs or performance metrics?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="g7" id="g7-1" value="1"><label for="g7-1">Not at all</label>
+            <input type="radio" name="g7" id="g7-2" value="2"><label for="g7-2">Ad-hoc / Informal</label>
+            <input type="radio" name="g7" id="g7-3" value="3"><label for="g7-3">Partially in place</label>
+            <input type="radio" name="g7" id="g7-4" value="4"><label for="g7-4">Largely in place</label>
+            <input type="radio" name="g7" id="g7-5" value="5"><label for="g7-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="submit-wrap">
+          <button type="button" class="btn-submit" onclick="submitForm('governance')">Submit Assessment</button>
+        </div>
+        <div class="validation-msg" id="val-governance">Please answer all 7 questions before submitting.</div>
+      </form>
+    </div>
+
+    <div class="result-panel" id="result-governance">
+      <div class="result-title">Data Governance Maturity Result</div>
+      <div class="score-line">
+        <span class="score-value" id="score-governance-val"></span>
+        <span class="maturity-badge" id="badge-governance"></span>
+      </div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-fill" id="bar-governance"></div>
+      </div>
+      <div class="recommendation" id="rec-governance"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ TAB 2: DATA QUALITY ═══════════════════ -->
+  <div class="tab-panel" id="panel-quality">
+    <div class="question-card">
+      <p class="section-intro">
+        Answer each question below by selecting the option that best reflects your organisation's current state.
+        All 7 questions must be answered before submitting.
+      </p>
+
+      <div class="scale-legend">
+        <span>Scale: </span>
+        <span>1 — Not at all &nbsp;|&nbsp;</span>
+        <span>2 — Ad-hoc / Informal &nbsp;|&nbsp;</span>
+        <span>3 — Partially in place &nbsp;|&nbsp;</span>
+        <span>4 — Largely in place &nbsp;|&nbsp;</span>
+        <span>5 — Fully implemented</span>
+      </div>
+
+      <form id="form-quality">
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">1</span>
+            Are data quality standards and thresholds defined for critical data elements?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="q1" id="q1-1" value="1"><label for="q1-1">Not at all</label>
+            <input type="radio" name="q1" id="q1-2" value="2"><label for="q1-2">Ad-hoc / Informal</label>
+            <input type="radio" name="q1" id="q1-3" value="3"><label for="q1-3">Partially in place</label>
+            <input type="radio" name="q1" id="q1-4" value="4"><label for="q1-4">Largely in place</label>
+            <input type="radio" name="q1" id="q1-5" value="5"><label for="q1-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">2</span>
+            Is data profiling or quality scanning conducted regularly on key datasets?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="q2" id="q2-1" value="1"><label for="q2-1">Not at all</label>
+            <input type="radio" name="q2" id="q2-2" value="2"><label for="q2-2">Ad-hoc / Informal</label>
+            <input type="radio" name="q2" id="q2-3" value="3"><label for="q2-3">Partially in place</label>
+            <input type="radio" name="q2" id="q2-4" value="4"><label for="q2-4">Largely in place</label>
+            <input type="radio" name="q2" id="q2-5" value="5"><label for="q2-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">3</span>
+            Are data quality issues formally tracked, assigned, and remediated?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="q3" id="q3-1" value="1"><label for="q3-1">Not at all</label>
+            <input type="radio" name="q3" id="q3-2" value="2"><label for="q3-2">Ad-hoc / Informal</label>
+            <input type="radio" name="q3" id="q3-3" value="3"><label for="q3-3">Partially in place</label>
+            <input type="radio" name="q3" id="q3-4" value="4"><label for="q3-4">Largely in place</label>
+            <input type="radio" name="q3" id="q3-5" value="5"><label for="q3-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">4</span>
+            Is there a data quality dashboard or scorecard visible to stakeholders?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="q4" id="q4-1" value="1"><label for="q4-1">Not at all</label>
+            <input type="radio" name="q4" id="q4-2" value="2"><label for="q4-2">Ad-hoc / Informal</label>
+            <input type="radio" name="q4" id="q4-3" value="3"><label for="q4-3">Partially in place</label>
+            <input type="radio" name="q4" id="q4-4" value="4"><label for="q4-4">Largely in place</label>
+            <input type="radio" name="q4" id="q4-5" value="5"><label for="q4-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">5</span>
+            Are data quality validation rules automated within data pipelines or systems?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="q5" id="q5-1" value="1"><label for="q5-1">Not at all</label>
+            <input type="radio" name="q5" id="q5-2" value="2"><label for="q5-2">Ad-hoc / Informal</label>
+            <input type="radio" name="q5" id="q5-3" value="3"><label for="q5-3">Partially in place</label>
+            <input type="radio" name="q5" id="q5-4" value="4"><label for="q5-4">Largely in place</label>
+            <input type="radio" name="q5" id="q5-5" value="5"><label for="q5-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">6</span>
+            Is root cause analysis performed and documented for recurring data quality issues?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="q6" id="q6-1" value="1"><label for="q6-1">Not at all</label>
+            <input type="radio" name="q6" id="q6-2" value="2"><label for="q6-2">Ad-hoc / Informal</label>
+            <input type="radio" name="q6" id="q6-3" value="3"><label for="q6-3">Partially in place</label>
+            <input type="radio" name="q6" id="q6-4" value="4"><label for="q6-4">Largely in place</label>
+            <input type="radio" name="q6" id="q6-5" value="5"><label for="q6-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <div class="question-label">
+            <span class="question-number">7</span>
+            Are data quality metrics and trends reported to leadership or data governance bodies?
+          </div>
+          <div class="options-row">
+            <input type="radio" name="q7" id="q7-1" value="1"><label for="q7-1">Not at all</label>
+            <input type="radio" name="q7" id="q7-2" value="2"><label for="q7-2">Ad-hoc / Informal</label>
+            <input type="radio" name="q7" id="q7-3" value="3"><label for="q7-3">Partially in place</label>
+            <input type="radio" name="q7" id="q7-4" value="4"><label for="q7-4">Largely in place</label>
+            <input type="radio" name="q7" id="q7-5" value="5"><label for="q7-5">Fully implemented</label>
+          </div>
+        </div>
+
+        <div class="submit-wrap">
+          <button type="button" class="btn-submit" onclick="submitForm('quality')">Submit Assessment</button>
+        </div>
+        <div class="validation-msg" id="val-quality">Please answer all 7 questions before submitting.</div>
+      </form>
+    </div>
+
+    <div class="result-panel" id="result-quality">
+      <div class="result-title">Data Quality Maturity Result</div>
+      <div class="score-line">
+        <span class="score-value" id="score-quality-val"></span>
+        <span class="maturity-badge" id="badge-quality"></span>
+      </div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-fill" id="bar-quality"></div>
+      </div>
+      <div class="recommendation" id="rec-quality"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── Tab switching ── */
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + tabId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* ── Maturity lookup ── */
+  const LEVELS = [
+    { min: 1.0, max: 1.9, label: 'Initial',    color: '#c0392b', rec: 'Your organisation is at the starting point — data governance is largely unstructured and reactive. Prioritise establishing a basic policy framework and identifying key data owners to create a foundation for progress.' },
+    { min: 2.0, max: 2.9, label: 'Developing',  color: '#e67e22', rec: 'Awareness of data governance exists but practices remain informal and inconsistent across the organisation. Focus on formalising key processes, assigning accountabilities, and building internal buy-in among stakeholders.' },
+    { min: 3.0, max: 3.9, label: 'Defined',     color: '#d4ac0d', rec: 'Processes are documented and standardised, providing a solid governance baseline. The next step is to strengthen enforcement mechanisms, integrate governance into day-to-day operations, and begin measuring outcomes.' },
+    { min: 4.0, max: 4.9, label: 'Managed',     color: '#2980b9', rec: 'Governance is actively measured and controlled, with clear ownership and metrics in place. Continue refining KPIs, expanding coverage to additional data domains, and embedding governance into strategic decision-making.' },
+    { min: 5.0, max: 5.0, label: 'Optimising',  color: '#27ae60', rec: 'Your organisation demonstrates best-in-class data governance with continuous improvement cycles embedded into practice. Maintain this standard by fostering innovation, benchmarking externally, and mentoring other teams.' },
+  ];
+
+  function getLevel(score) {
+    if (score >= 5.0) return LEVELS[4];
+    return LEVELS.find(l => score >= l.min && score <= l.max) || LEVELS[0];
+  }
+
+  /* ── Submit logic ── */
+  function submitForm(domain) {
+    const prefix = domain === 'governance' ? 'g' : 'q';
+    const names  = [1,2,3,4,5,6,7].map(n => prefix + n);
+    const valMsg = document.getElementById('val-' + domain);
+
+    // Collect values
+    const values = names.map(name => {
+      const sel = document.querySelector(`input[name="${name}"]:checked`);
+      return sel ? parseInt(sel.value, 10) : null;
+    });
+
+    // Validate
+    if (values.includes(null)) {
+      valMsg.style.display = 'block';
+      return;
+    }
+    valMsg.style.display = 'none';
+
+    // Score
+    const avg   = values.reduce((a, b) => a + b, 0) / values.length;
+    const score = Math.round(avg * 10) / 10;
+    const level = getLevel(score);
+    const pct   = ((score - 1) / 4) * 100; // 1→0%, 5→100%
+
+    // Populate result panel
+    document.getElementById('score-' + domain + '-val').textContent = score.toFixed(1) + ' / 5.0';
+    const badge = document.getElementById('badge-' + domain);
+    badge.textContent = level.label;
+    badge.style.background = level.color;
+
+    const bar = document.getElementById('bar-' + domain);
+    bar.style.background = level.color;
+
+    document.getElementById('rec-' + domain).textContent = level.rec;
+
+    // Show panel then animate bar
+    const panel = document.getElementById('result-' + domain);
+    panel.classList.add('visible');
+
+    // Trigger animation after paint
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        bar.style.width = pct.toFixed(1) + '%';
+      });
+    });
+
+    // Scroll to result
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
+</body>
+</html>
