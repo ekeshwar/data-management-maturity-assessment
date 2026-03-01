@@ -1,0 +1,50 @@
+name: Deploy — Development
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject dev environment banner
+        run: |
+          mkdir -p dist
+          cp index.html dist/index.html
+          python3 - <<'PYEOF'
+import re
+
+banner_css = """
+  /* Environment banner */
+  .env-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    text-align: center; font-size: 0.82rem; font-weight: 700;
+    padding: 7px 12px; letter-spacing: 0.04em; font-family: 'Montserrat', sans-serif; }
+  .env-dev { background: #f59e0b; color: #1c0a00; }
+  body { padding-top: 32px; }
+"""
+banner_html = '<div class="env-banner env-dev">🔧 DEVELOPMENT ENVIRONMENT — Not for live use</div>'
+
+with open('dist/index.html', 'r', encoding='utf-8') as f:
+    html = f.read()
+
+html = html.replace('</style>', banner_css + '\n  </style>', 1)
+html = html.replace('<body>', '<body>\n' + banner_html, 1)
+
+with open('dist/index.html', 'w', encoding='utf-8') as f:
+    f.write(html)
+PYEOF
+
+      - name: Deploy to GitHub Pages — /dev/
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
+          target-folder: dev
+          clean: true
+          single-commit: false

@@ -1,0 +1,28 @@
+name: Deploy — Production
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare deployment folder
+        run: |
+          mkdir -p dist
+          cp index.html dist/index.html
+
+      - name: Deploy to GitHub Pages — / (root)
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
+          target-folder: .
+          clean: false
+          single-commit: false
