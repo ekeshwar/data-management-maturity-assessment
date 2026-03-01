@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enterprise Data Management Tool | Uniqus Consultech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; background: #FAF2F7; color: #0D0D0D; min-height: 100vh; }
+
+    /* HEADER */
+    header { background: linear-gradient(135deg, #482A7A 0%, #B31F7E 100%); color: #fff; padding: 0; box-shadow: 0 3px 12px rgba(72,42,122,0.35); }
+    .header-inner { max-width: 1200px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .header-brand { display: flex; align-items: center; gap: 14px; }
+    .header-logo-mark { width: 40px; height: 40px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.3); }
+    .header-text h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.01em; line-height: 1.2; }
+    .header-text h1 span { font-weight: 800; }
+    .header-text .tagline { font-size: 0.72rem; opacity: 0.78; margin-top: 2px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .header-tool-name { font-size: 0.82rem; font-weight: 600; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 5px 14px; white-space: nowrap; letter-spacing: 0.01em; }
+
+    /* LAYOUT */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; }
+
+    /* FOOTER */
+    .site-footer { background: linear-gradient(135deg, #482A7A 0%, #B31F7E 100%); color: rgba(255,255,255,0.75); text-align: center; padding: 18px 20px; font-size: 0.75rem; letter-spacing: 0.03em; margin-top: 0; }
+    .site-footer strong { color: #fff; }
+
+    /* TAB BAR */
+    .tab-bar { display: flex; margin-top: 24px; border-bottom: 3px solid #482A7A; padding-top: 8px; }
+    .tab-btn { padding: 11px 30px; font-size: 0.93rem; font-weight: 600; cursor: pointer; border: none; background: #EFE5F5; color: #482A7A; border-radius: 8px 8px 0 0; margin-right: 4px; transition: background 0.18s, color 0.18s; outline: none; }
+    .tab-btn:hover { background: #DDD0EE; }
+    .tab-btn.active { background: #482A7A; color: #fff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; font-size: 0.88rem; font-weight: 600; border: none; border-radius: 25px; cursor: pointer; transition: background 0.18s, opacity 0.18s, transform 0.1s; outline: none; font-family: inherit; }
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn-primary { background: #482A7A; color: #fff; }
+    .btn-primary:hover { background: #5d3699; }
+    .btn-success { background: #B31F7E; color: #fff; }
+    .btn-success:hover { background: #911864; }
+    .btn-outline { background: #fff; color: #482A7A; border: 2px solid #482A7A; }
+    .btn-outline:hover { background: #F1D9E9; }
+    .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ===================== DAMA MODULE ===================== */
+    #panel-dama { background: #fff; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(72,42,122,0.12); min-height: 600px; }
+
+    .dama-layout { display: flex; min-height: 600px; }
+
+    /* Sidebar */
+    .dama-sidebar { width: 230px; flex-shrink: 0; background: #F7F5F9; border-right: 1px solid #e2e6f0; border-radius: 0 0 0 10px; padding: 14px 0; overflow-y: auto; }
+    .dama-sidebar-title { font-size: 0.69rem; font-weight: 700; letter-spacing: 0.08em; color: #8a94a8; text-transform: uppercase; padding: 0 14px 10px; }
+    .dim-item { padding: 9px 14px; font-size: 0.86rem; font-weight: 500; color: #4a5568; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; display: flex; align-items: center; gap: 9px; position: relative; }
+    .dim-item:hover { background: #EDE5F5; color: #482A7A; }
+    .dim-item.active { background: #EDE5F5; border-left-color: #482A7A; color: #482A7A; font-weight: 700; }
+    .dim-item.completed::after { content: '✓'; margin-left: auto; font-size: 0.82rem; color: #61CE70; font-weight: 700; }
+    .dim-badge { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Content */
+    .dama-content { flex: 1; padding: 26px 34px; overflow-y: auto; }
+    .dama-content-header { margin-bottom: 18px; }
+    .dama-content-header h2 { font-size: 1.18rem; font-weight: 700; color: #482A7A; }
+    .dama-content-header p { font-size: 0.82rem; color: #667; margin-top: 3px; }
+
+    .dim-panel { display: none; }
+    .dim-panel.active { display: block; }
+
+    /* Scale legend */
+    .scale-legend { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 0.71rem; color: #667; margin-bottom: 18px; background: #F7F5F9; border-radius: 6px; padding: 7px 12px; }
+    .scale-legend strong { color: #482A7A; }
+
+    /* Questions */
+    .question-block { margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid #eaecf2; }
+    .question-block:last-of-type { border-bottom: none; }
+    .question-label { font-size: 0.91rem; font-weight: 600; color: #482A7A; margin-bottom: 11px; line-height: 1.45; display: flex; align-items: flex-start; gap: 9px; }
+    .question-number { display: inline-flex; align-items: center; justify-content: center; background: #482A7A; color: #fff; font-size: 0.7rem; font-weight: 700; border-radius: 50%; width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+
+    /* Pill radios */
+    .options-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .options-row input[type="radio"] { display: none; }
+    .options-row label { flex: 1; min-width: 90px; text-align: center; padding: 7px 5px; font-size: 0.74rem; font-weight: 500; border: 2px solid #c8cedc; border-radius: 24px; cursor: pointer; color: #455; background: #F7F5F9; transition: border-color 0.15s, background 0.15s, color 0.15s; user-select: none; line-height: 1.3; }
+    .options-row label:hover { border-color: #3b72d4; background: #F0E8FF; color: #482A7A; }
+    .options-row input[type="radio"]:checked + label { border-color: #482A7A; background: #482A7A; color: #fff; font-weight: 700; }
+
+    /* Nav bar */
+    .dama-nav-bar { display: flex; align-items: center; justify-content: space-between; margin-top: 22px; padding-top: 18px; border-top: 1px solid #eaecf2; }
+    .dim-progress { font-size: 0.84rem; color: #667; font-weight: 600; }
+
+    /* DAMA Results */
+    #dama-results { display: none; padding: 26px 34px; }
+    #dama-results.visible { display: block; }
+
+    .overall-score-card { background: linear-gradient(135deg, #482A7A 0%, #B31F7E 100%); color: #fff; border-radius: 16px; padding: 26px 34px; display: flex; align-items: center; gap: 30px; margin-bottom: 24px; flex-wrap: wrap; box-shadow: 0 6px 24px rgba(72,42,122,0.28); }
+    .overall-score-num { font-size: 3.2rem; font-weight: 800; line-height: 1; }
+    .overall-score-label { font-size: 0.82rem; opacity: 0.7; margin-top: 4px; }
+    .overall-badge { display: inline-block; padding: 5px 16px; border-radius: 20px; font-size: 0.95rem; font-weight: 700; margin-top: 7px; }
+    .overall-rec { flex: 1; font-size: 0.86rem; opacity: 0.88; line-height: 1.6; padding-left: 10px; }
+    .overall-org { margin-left: auto; text-align: right; }
+    .overall-org .org-name { font-size: 1.05rem; font-weight: 700; }
+    .overall-org .org-date { font-size: 0.78rem; opacity: 0.7; margin-top: 2px; }
+
+    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 24px; }
+
+    /* Radar */
+    .radar-card { background: #fff; border: 1px solid #e2e6f0; border-radius: 10px; padding: 18px; }
+    .radar-card h3 { font-size: 0.97rem; font-weight: 700; color: #482A7A; margin-bottom: 14px; }
+    #dama-radar { width: 100%; height: auto; display: block; }
+
+    /* Dimension table */
+    .dim-table-card { background: #fff; border: 1px solid #e2e6f0; border-radius: 10px; padding: 18px; overflow-x: auto; }
+    .dim-table-card h3 { font-size: 0.97rem; font-weight: 700; color: #482A7A; margin-bottom: 14px; }
+    .dim-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    .dim-table th { background: linear-gradient(90deg, #EDE5F5, #F1D9E9); color: #482A7A; font-weight: 700; text-align: left; padding: 9px 11px; border-bottom: 2px solid #DDD0EE; }
+    .dim-table td { padding: 8px 11px; border-bottom: 1px solid #eaecf2; vertical-align: middle; }
+    .dim-table tr:last-child td { border-bottom: none; }
+    .score-pill { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; color: #fff; }
+    .mini-bar-wrap { background: #eaecf2; border-radius: 4px; height: 7px; width: 90px; overflow: hidden; display: inline-block; vertical-align: middle; }
+    .mini-bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+
+    /* Recommendations */
+    .recommendations-card { background: #fff; border: 1px solid #e2e6f0; border-radius: 10px; padding: 22px; margin-bottom: 22px; }
+    .recommendations-card h3 { font-size: 0.97rem; font-weight: 700; color: #482A7A; margin-bottom: 14px; }
+    .rec-item { padding: 13px 15px; border-left: 4px solid #482A7A; background: #F7F5F9; border-radius: 0 6px 6px 0; margin-bottom: 10px; font-size: 0.86rem; line-height: 1.55; color: #334; }
+    .rec-item .rec-dim { font-weight: 700; color: #482A7A; margin-bottom: 4px; font-size: 0.83rem; }
+
+    .dama-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+
+    .org-input-wrap { background: #F7F5F9; border: 1px solid #e2e6f0; border-radius: 8px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+    .org-input-wrap label { font-size: 0.86rem; font-weight: 600; color: #482A7A; white-space: nowrap; }
+    .org-input-wrap input { flex: 1; padding: 7px 11px; border: 1px solid #c8cedc; border-radius: 6px; font-size: 0.88rem; outline: none; font-family: inherit; }
+    .org-input-wrap input:focus { border-color: #482A7A; }
+
+    /* ===================== DQ MODULE ===================== */
+    #panel-dq { background: #fff; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(72,42,122,0.12); min-height: 600px; padding: 26px 30px; }
+
+    /* Step bar */
+    .step-bar { display: flex; align-items: center; margin-bottom: 30px; }
+    .step-item { display: flex; align-items: center; }
+    .step-circle { width: 34px; height: 34px; border-radius: 50%; background: #EFE5F5; color: #8a94a8; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+    .step-label { font-size: 0.76rem; font-weight: 600; color: #8a94a8; margin: 0 8px; white-space: nowrap; transition: color 0.2s; }
+    .step-connector { flex: 1; height: 2px; background: #EFE5F5; margin: 0 2px; transition: background 0.2s; }
+    .step-item.active .step-circle { background: #482A7A; color: #fff; }
+    .step-item.active .step-label { color: #482A7A; }
+    .step-item.done .step-circle { background: #61CE70; color: #fff; }
+    .step-item.done .step-label { color: #27a355; }
+    .step-connector.done { background: #61CE70; }
+    .dq-step { display: none; }
+    .dq-step.active { display: block; }
+
+    /* Upload */
+    .drop-zone { border: 2px dashed #c8cedc; border-radius: 10px; padding: 46px 30px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: #fafbfd; margin-bottom: 14px; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #B31F7E; background: #FBF0F7; }
+    .drop-zone-icon { font-size: 2.4rem; margin-bottom: 10px; }
+    .drop-zone h3 { font-size: 1rem; font-weight: 700; color: #482A7A; margin-bottom: 5px; }
+    .drop-zone p { font-size: 0.84rem; color: #667; }
+    .browse-link { color: #2980b9; cursor: pointer; text-decoration: underline; }
+    #file-input { display: none; }
+
+    .file-info-bar { display: none; background: #E8F8EB; border: 1px solid #61CE70; border-radius: 8px; padding: 9px 14px; margin-bottom: 14px; font-size: 0.86rem; color: #1e7a3a; font-weight: 600; align-items: center; gap: 8px; }
+    .file-info-bar.visible { display: flex; }
+    .preview-wrap { display: none; margin-bottom: 18px; }
+    .preview-wrap.visible { display: block; }
+    .preview-title { font-size: 0.83rem; font-weight: 700; color: #482A7A; margin-bottom: 7px; }
+    .preview-table-wrap { overflow-x: auto; border: 1px solid #e2e6f0; border-radius: 8px; }
+    .preview-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .preview-table th { background: linear-gradient(90deg, #482A7A, #B31F7E); color: #fff; padding: 7px 11px; text-align: left; white-space: nowrap; }
+    .preview-table td { padding: 6px 11px; border-bottom: 1px solid #eaecf2; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+    .preview-table tr:last-child td { border-bottom: none; }
+    .preview-table tr:nth-child(even) { background: #F7F5F9; }
+    .step1-nav { display: flex; justify-content: flex-end; margin-top: 14px; }
+
+    /* Configure rules */
+    .rule-layout { display: flex; gap: 18px; min-height: 480px; }
+    .col-list { width: 195px; flex-shrink: 0; border: 1px solid #e2e6f0; border-radius: 8px; overflow-y: auto; max-height: 530px; }
+    .col-list-header { font-size: 0.69rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8a94a8; padding: 9px 11px; border-bottom: 1px solid #e2e6f0; background: #F7F5F9; }
+    .col-list-item { padding: 8px 11px; font-size: 0.83rem; cursor: pointer; border-bottom: 1px solid #eaecf2; transition: background 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .col-list-item:last-child { border-bottom: none; }
+    .col-list-item:hover { background: #EDE5F5; }
+    .col-list-item.selected { background: #482A7A; color: #fff; }
+
+    .rule-config { flex: 1; min-width: 0; }
+    .rule-tabs { display: flex; border-bottom: 2px solid #e2e6f0; margin-bottom: 18px; flex-wrap: wrap; gap: 2px; }
+    .rule-tab { padding: 7px 14px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: none; background: none; color: #667; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color 0.15s, border-color 0.15s; outline: none; font-family: inherit; }
+    .rule-tab:hover { color: #482A7A; }
+    .rule-tab.active { color: #B31F7E; border-bottom-color: #B31F7E; }
+    .rule-tab-panel { display: none; }
+    .rule-tab-panel.active { display: block; }
+
+    .rule-section-title { font-size: 0.87rem; font-weight: 700; color: #482A7A; margin-bottom: 11px; }
+    .rule-field-group { margin-bottom: 14px; }
+    .rule-field-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #556; margin-bottom: 5px; }
+    .rule-field-group input[type="text"], .rule-field-group input[type="number"], .rule-field-group textarea, .rule-field-group select { width: 100%; padding: 7px 10px; border: 1px solid #c8cedc; border-radius: 6px; font-size: 0.86rem; outline: none; font-family: inherit; }
+    .rule-field-group input:focus, .rule-field-group textarea:focus { border-color: #482A7A; }
+    .rule-field-group textarea { min-height: 68px; resize: vertical; }
+
+    .checkbox-group { display: flex; flex-direction: column; gap: 7px; }
+    .checkbox-group label { display: flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 500; color: #334; cursor: pointer; }
+    .checkbox-group input[type="checkbox"] { margin: 0; cursor: pointer; flex-shrink: 0; }
+    .match-type-row { display: flex; gap: 14px; margin-bottom: 11px; }
+    .match-type-row label { display: flex; align-items: center; gap: 6px; font-size: 0.84rem; font-weight: 500; cursor: pointer; }
+    .slider-wrap { display: flex; align-items: center; gap: 10px; }
+    .slider-wrap input[type="range"] { flex: 1; }
+    .slider-val { font-size: 0.86rem; font-weight: 700; color: #482A7A; min-width: 36px; }
+
+    /* Rules list */
+    .rules-list-wrap { margin-top: 22px; border-top: 2px solid #e2e6f0; padding-top: 14px; }
+    .rules-list-title { font-size: 0.86rem; font-weight: 700; color: #482A7A; margin-bottom: 11px; display: flex; align-items: center; gap: 8px; }
+    .rule-count-badge { display: inline-flex; align-items: center; justify-content: center; background: #482A7A; color: #fff; border-radius: 10px; font-size: 0.73rem; font-weight: 700; padding: 2px 8px; }
+    .rule-entry { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border: 1px solid #e2e6f0; border-radius: 8px; margin-bottom: 7px; background: #F7F5F9; font-size: 0.82rem; }
+    .rule-entry-dim { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #482A7A; color: #fff; white-space: nowrap; }
+    .rule-entry-label { flex: 1; color: #334; }
+    .rule-entry-del { background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 1rem; padding: 2px 5px; line-height: 1; }
+    .step2-nav { display: flex; justify-content: space-between; margin-top: 22px; }
+
+    /* Running */
+    .run-progress-wrap { max-width: 480px; margin: 60px auto; text-align: center; }
+    .run-progress-wrap h3 { font-size: 1.08rem; font-weight: 700; color: #482A7A; margin-bottom: 7px; }
+    .run-progress-wrap p { font-size: 0.86rem; color: #667; margin-bottom: 22px; }
+    .progress-bar-wrap { background: #e2e6f0; border-radius: 8px; height: 10px; overflow: hidden; margin-bottom: 10px; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #482A7A, #B31F7E); border-radius: 8px; width: 0%; transition: width 0.3s ease; }
+    .progress-label { font-size: 0.8rem; color: #8a94a8; }
+
+    /* Results */
+    .dq-summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+    .dq-summary-header h2 { font-size: 1.12rem; font-weight: 700; color: #482A7A; }
+    .summary-kpi-row { display: flex; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+    .kpi-card { background: #F7F5F9; border: 1px solid #e2e6f0; border-radius: 10px; padding: 14px 22px; flex: 1; min-width: 120px; }
+    .kpi-card .kpi-val { font-size: 1.75rem; font-weight: 800; color: #482A7A; }
+    .kpi-card .kpi-val.pass { color: #27a355; }
+    .kpi-card .kpi-val.fail { color: #e74c3c; }
+    .kpi-card .kpi-label { font-size: 0.74rem; color: #8a94a8; font-weight: 600; margin-top: 2px; }
+    .summary-table-wrap { overflow-x: auto; border: 1px solid #e2e6f0; border-radius: 10px; }
+    .summary-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    .summary-table th { background: linear-gradient(90deg, #482A7A, #B31F7E); color: #fff; padding: 10px 13px; text-align: left; font-size: 0.8rem; white-space: nowrap; }
+    .summary-table td { padding: 9px 13px; border-bottom: 1px solid #eaecf2; }
+    .summary-table tr:last-child td { border-bottom: none; }
+    .summary-table tr:nth-child(even) { background: #F7F5F9; }
+    .status-pass { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.74rem; font-weight: 700; background: #E8F8EB; color: #1e7a3a; }
+    .status-fail { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.74rem; font-weight: 700; background: #fdecea; color: #c0392b; }
+    .step4-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; flex-wrap: wrap; gap: 10px; }
+
+    /* Client name mandatory */
+    .client-name-wrap { background: #EDE5F5; border: 2px solid #482A7A; border-radius: 10px; padding: 14px 22px; margin: 20px 0 0; display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+    .client-name-wrap label { font-size: 0.9rem; font-weight: 700; color: #482A7A; white-space: nowrap; padding-top: 8px; }
+    .client-name-wrap input[type="text"] { width: 100%; padding: 8px 12px; border: 2px solid #c8cedc; border-radius: 6px; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.15s; }
+    .client-name-wrap input[type="text"]:focus { border-color: #482A7A; }
+    .client-name-wrap input[type="text"].input-error { border-color: #c0392b; background: #fdecea; }
+    .required-star { color: #B31F7E; font-weight: 800; margin-right: 2px; }
+    .client-name-error { font-size: 0.78rem; color: #c0392b; font-weight: 600; margin-top: 4px; display: none; }
+    .client-name-error.visible { display: block; }
+    .client-name-field { flex: 1; min-width: 220px; }
+
+    /* Dimension toggle */
+    .dim-toggle { appearance: none; -webkit-appearance: none; width: 32px; height: 17px; background: #c8cedc; border-radius: 9px; cursor: pointer; position: relative; flex-shrink: 0; transition: background 0.2s; }
+    .dim-toggle:checked { background: #482A7A; }
+    .dim-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 13px; height: 13px; border-radius: 50%; background: #fff; transition: left 0.18s; }
+    .dim-toggle:checked::after { left: 17px; }
+    .dim-item.dim-disabled { opacity: 0.45; text-decoration: line-through; }
+    .dim-item.dim-disabled .dim-badge { background: #c8cedc !important; }
+
+    /* Question management */
+    .question-del-btn { background: #fdecea; border: 1px solid #f5c6cb; color: #c0392b; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 0.9rem; font-weight: 700; line-height: 1; padding: 0; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 6px; transition: background 0.15s, color 0.15s; }
+    .question-del-btn:hover { background: #c0392b; color: #fff; border-color: #c0392b; }
+    .add-question-form { background: #F7F5F9; border: 1px dashed #c4b5e0; border-radius: 8px; padding: 14px 16px; margin-top: 18px; }
+    .add-question-form .aqf-label { font-size: 0.82rem; font-weight: 700; color: #482A7A; display: block; margin-bottom: 7px; }
+    .add-question-form textarea { width: 100%; padding: 7px 10px; border: 1px solid #c8cedc; border-radius: 6px; font-size: 0.84rem; font-family: inherit; min-height: 54px; resize: vertical; outline: none; margin-bottom: 8px; }
+    .add-question-form textarea:focus { border-color: #482A7A; }
+
+    /* Disabled dimension placeholder */
+    .dim-disabled-msg { text-align: center; padding: 55px 20px; color: #8a94a8; }
+    .dim-disabled-msg .msg-icon { font-size: 2.2rem; margin-bottom: 10px; }
+    .dim-disabled-msg strong { display: block; margin-bottom: 6px; font-size: 1rem; color: #482A7A; }
+    .dim-disabled-msg span { font-size: 0.84rem; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) { .results-grid { grid-template-columns: 1fr; } .dama-sidebar { width: 190px; } }
+    @media (max-width: 700px) {
+      .dama-layout { flex-direction: column; }
+      .dama-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e2e6f0; border-radius: 0; max-height: 150px; }
+      .rule-layout { flex-direction: column; }
+      .col-list { width: 100%; max-height: 160px; }
+      header h1 { font-size: 1.15rem; }
+      .dama-content { padding: 14px; }
+      #panel-dq { padding: 14px; }
+      .overall-score-card { gap: 18px; padding: 18px; }
+      .overall-score-num { font-size: 2.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo-mark">U</div>
+      <div class="header-text">
+        <h1><span>Uniqus</span> Consultech</h1>
+        <div class="tagline">Change the way consulting is done</div>
+      </div>
+    </div>
+    <div class="header-tool-name">Enterprise Data Management Tool</div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('dama', this)">DAMA Maturity Assessment</button>
+    <button class="tab-btn" onclick="switchTab('dq', this)">Data Quality Assessment</button>
+  </div>
+
+  <!-- ═══════════════════════ DAMA PANEL ═══════════════════════ -->
+  <div class="tab-panel active" id="panel-dama">
+
+    <!-- Mandatory Client Name -->
+    <div class="client-name-wrap" id="dama-client-wrap">
+      <label for="client-name-input"><span class="required-star">★</span> Client / Organisation Name:</label>
+      <div class="client-name-field">
+        <input type="text" id="client-name-input" placeholder="Enter client or organisation name..." autocomplete="off" />
+        <div class="client-name-error" id="client-name-error">Client name is required before calculating maturity.</div>
+      </div>
+    </div>
+
+    <!-- Survey Layout -->
+    <div class="dama-layout" id="dama-survey-layout">
+      <div class="dama-sidebar">
+        <div class="dama-sidebar-title">Knowledge Areas</div>
+        <div id="dama-dim-list"></div>
+      </div>
+      <div class="dama-content">
+        <div class="dama-content-header">
+          <h2 id="dim-title">Data Governance</h2>
+          <p>Rate your organisation on each question — 1 = Not at all, 5 = Fully implemented</p>
+        </div>
+        <div class="scale-legend">
+          <strong>Scale:</strong>
+          <span>1 — Not at all</span><span>|</span>
+          <span>2 — Ad-hoc / Informal</span><span>|</span>
+          <span>3 — Partially in place</span><span>|</span>
+          <span>4 — Largely in place</span><span>|</span>
+          <span>5 — Fully implemented</span>
+        </div>
+        <div id="dama-dim-panels"></div>
+        <div class="dama-nav-bar">
+          <button class="btn btn-outline" onclick="prevDimension()">← Previous</button>
+          <span class="dim-progress" id="dim-progress">Dimension 1 of 11</span>
+          <button class="btn btn-primary" onclick="nextDimension()" id="dama-next-btn">Next →</button>
+        </div>
+        <div style="display:flex;justify-content:center;margin-top:18px;">
+          <button class="btn btn-success" onclick="submitDAMA()" id="dama-submit-btn" style="display:none;padding:13px 38px;font-size:0.97rem;">
+            Calculate Maturity →
+          </button>
+        </div>
+        <div id="dama-val-msg" style="color:#c0392b;font-size:0.83rem;font-weight:600;text-align:center;margin-top:7px;display:none;">
+          Please answer all questions for this dimension before proceeding.
+        </div>
+      </div>
+    </div>
+
+    <!-- Results (hidden until submitted) -->
+    <div id="dama-results">
+      <div class="overall-score-card">
+        <div>
+          <div class="overall-score-num" id="dama-overall-num">—</div>
+          <div class="overall-score-label">Overall Maturity Score (out of 5.0)</div>
+          <span class="overall-badge" id="dama-overall-badge">—</span>
+        </div>
+        <div class="overall-rec" id="dama-overall-rec">—</div>
+        <div class="overall-org">
+          <div class="org-name" id="dama-display-org">—</div>
+          <div class="org-date" id="dama-display-date">—</div>
+        </div>
+      </div>
+      <div class="dama-actions">
+        <button class="btn btn-outline" onclick="retakeDAMA()">← Retake Assessment</button>
+        <button class="btn btn-primary" onclick="exportDamaPDF()" id="pdf-export-btn">Export PDF Report</button>
+      </div>
+      <div class="results-grid">
+        <div class="radar-card">
+          <h3>DAMA Wheel — Maturity Radar</h3>
+          <svg id="dama-radar" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="dim-table-card">
+          <h3>Dimension Scores</h3>
+          <table class="dim-table">
+            <thead><tr><th>Knowledge Area</th><th>Score</th><th>Level</th><th>Bar</th></tr></thead>
+            <tbody id="dama-dim-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="recommendations-card">
+        <h3>Priority Recommendations (3 Lowest Scoring Areas)</h3>
+        <div id="dama-recommendations"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ DQ PANEL ═══════════════════════ -->
+  <div class="tab-panel" id="panel-dq">
+
+    <!-- Step bar -->
+    <div class="step-bar">
+      <div class="step-item active" id="step-ind-1">
+        <div class="step-circle">1</div>
+        <span class="step-label">Upload</span>
+      </div>
+      <div class="step-connector" id="conn-1"></div>
+      <div class="step-item" id="step-ind-2">
+        <div class="step-circle">2</div>
+        <span class="step-label">Configure Rules</span>
+      </div>
+      <div class="step-connector" id="conn-2"></div>
+      <div class="step-item" id="step-ind-3">
+        <div class="step-circle">3</div>
+        <span class="step-label">Run Assessment</span>
+      </div>
+      <div class="step-connector" id="conn-3"></div>
+      <div class="step-item" id="step-ind-4">
+        <div class="step-circle">4</div>
+        <span class="step-label">Results</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Upload -->
+    <div id="dq-step-1" class="dq-step active">
+      <div class="drop-zone" id="drop-zone"
+           onclick="document.getElementById('file-input').click()"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="handleDrop(event)">
+        <div class="drop-zone-icon">📂</div>
+        <h3>Drop your CSV or Excel file here</h3>
+        <p>or <span class="browse-link">click to browse</span></p>
+        <p style="margin-top:7px;font-size:0.76rem;color:#8a94a8;">Supports .csv, .xlsx, .xls</p>
+      </div>
+      <input type="file" id="file-input" accept=".csv,.xlsx,.xls" onchange="handleFileInputChange(event)" />
+      <div class="file-info-bar" id="file-info-bar">
+        <span>✓</span><span id="file-info-text"></span>
+      </div>
+      <div class="preview-wrap" id="preview-wrap">
+        <div class="preview-title">Preview — first 10 rows</div>
+        <div class="preview-table-wrap">
+          <table class="preview-table" id="preview-table"></table>
+        </div>
+      </div>
+      <div class="step1-nav">
+        <button class="btn btn-primary" onclick="goToStep(2)" id="step1-next-btn" disabled>Next: Configure Rules →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Configure Rules -->
+    <div id="dq-step-2" class="dq-step">
+      <div class="rule-layout">
+        <div class="col-list">
+          <div class="col-list-header">Columns</div>
+          <div id="col-list"></div>
+        </div>
+        <div class="rule-config">
+          <div style="font-size:0.83rem;color:#8a94a8;margin-bottom:11px;" id="selected-col-label">Select a column from the left to configure rules.</div>
+          <div class="rule-tabs">
+            <button class="rule-tab active" onclick="switchRuleTab('uniqueness',this)">Uniqueness</button>
+            <button class="rule-tab" onclick="switchRuleTab('completeness',this)">Completeness</button>
+            <button class="rule-tab" onclick="switchRuleTab('standardisation',this)">Standardisation</button>
+            <button class="rule-tab" onclick="switchRuleTab('validation',this)">Validation</button>
+            <button class="rule-tab" onclick="switchRuleTab('business',this)">Business Rules</button>
+          </div>
+
+          <!-- Uniqueness -->
+          <div id="rule-tab-uniqueness" class="rule-tab-panel active">
+            <div class="rule-section-title">Uniqueness / Duplicate Detection</div>
+            <div class="rule-field-group">
+              <label>Additional columns for composite key (optional):</label>
+              <div id="uniqueness-col-checkboxes" class="checkbox-group"></div>
+            </div>
+            <div class="rule-field-group">
+              <label>Match type:</label>
+              <div class="match-type-row">
+                <label><input type="radio" name="match-type" value="exact" checked> Exact</label>
+                <label><input type="radio" name="match-type" value="fuzzy"> Fuzzy</label>
+              </div>
+            </div>
+            <div id="fuzzy-threshold-wrap" style="display:none;" class="rule-field-group">
+              <label>Fuzzy similarity threshold:</label>
+              <div class="slider-wrap">
+                <input type="range" min="70" max="100" value="85" id="fuzzy-slider"
+                       oninput="document.getElementById('fuzzy-val').textContent=this.value+'%'">
+                <span class="slider-val" id="fuzzy-val">85%</span>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="addUniquenessRule()">Add Duplicate Rule</button>
+          </div>
+
+          <!-- Completeness -->
+          <div id="rule-tab-completeness" class="rule-tab-panel">
+            <div class="rule-section-title">Completeness — Null / Empty Check</div>
+            <p style="font-size:0.84rem;color:#667;margin-bottom:12px;">Select the column on the left, then add a completeness rule to flag empty or null values.</p>
+            <button class="btn btn-primary btn-sm" onclick="addCompletenessRule()">Add Completeness Rule for Selected Column</button>
+          </div>
+
+          <!-- Standardisation -->
+          <div id="rule-tab-standardisation" class="rule-tab-panel">
+            <div class="rule-section-title">Standardisation Rules</div>
+            <div class="checkbox-group" id="std-checkboxes">
+              <label><input type="checkbox" value="no-special-chars"> No Special Characters</label>
+              <label><input type="checkbox" value="uppercase"> UPPERCASE</label>
+              <label><input type="checkbox" value="lowercase"> lowercase</label>
+              <label><input type="checkbox" value="numeric-only"> Numeric Only</label>
+              <label><input type="checkbox" value="date-format"> Date Format
+                <input type="text" placeholder="YYYY-MM-DD" id="date-format-input"
+                       style="margin-left:8px;width:110px;padding:3px 7px;border:1px solid #c8cedc;border-radius:4px;font-size:0.78rem;">
+              </label>
+              <label><input type="checkbox" value="max-length"> Max Length
+                <input type="number" id="max-length-input" min="1" placeholder="e.g. 50"
+                       style="margin-left:8px;width:75px;padding:3px 7px;border:1px solid #c8cedc;border-radius:4px;font-size:0.78rem;">
+              </label>
+              <label><input type="checkbox" value="min-length"> Min Length
+                <input type="number" id="min-length-input" min="1" placeholder="e.g. 2"
+                       style="margin-left:8px;width:75px;padding:3px 7px;border:1px solid #c8cedc;border-radius:4px;font-size:0.78rem;">
+              </label>
+            </div>
+            <button class="btn btn-primary btn-sm" style="margin-top:13px;" onclick="addStandardisationRules()">Add Standardisation Rules</button>
+          </div>
+
+          <!-- Validation -->
+          <div id="rule-tab-validation" class="rule-tab-panel">
+            <div class="rule-section-title">Allowed Values</div>
+            <div class="rule-field-group">
+              <label>Allowed values (comma-separated):</label>
+              <input type="text" id="allowed-values-input" placeholder="e.g. Active, Inactive, Pending">
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="addValidationRule('allowed-values')" style="margin-bottom:18px;">Add Allowed Values Rule</button>
+            <hr style="border:none;border-top:1px solid #e2e6f0;margin-bottom:16px;">
+            <div class="rule-section-title">Numeric Range</div>
+            <div style="display:flex;gap:12px;">
+              <div class="rule-field-group" style="flex:1;">
+                <label>Min Value:</label>
+                <input type="number" id="range-min-input" placeholder="e.g. 0">
+              </div>
+              <div class="rule-field-group" style="flex:1;">
+                <label>Max Value:</label>
+                <input type="number" id="range-max-input" placeholder="e.g. 1000">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="addValidationRule('numeric-range')">Add Numeric Range Rule</button>
+            <hr style="border:none;border-top:1px solid #e2e6f0;margin:16px 0 12px;">
+            <div class="rule-section-title">Format Validation</div>
+            <p style="font-size:0.83rem;color:#667;margin-bottom:10px;">Validate that column values match a recognised format. Select a column first.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" onclick="addFormatCheckRule('email')">Email Format</button>
+              <button class="btn btn-outline btn-sm" onclick="addFormatCheckRule('pan')">PAN (India)</button>
+              <button class="btn btn-outline btn-sm" onclick="addFormatCheckRule('gst')">GST (India)</button>
+            </div>
+          </div>
+
+          <!-- Business Rules -->
+          <div id="rule-tab-business" class="rule-tab-panel">
+            <div class="rule-section-title">Business Rules — JS Expression</div>
+            <div class="rule-field-group">
+              <label>Rule name:</label>
+              <input type="text" id="business-rule-name" placeholder="e.g. StartDate must be before EndDate">
+            </div>
+            <div class="rule-field-group">
+              <label>Expression (use <code style="background:#f0f2f7;padding:1px 4px;border-radius:3px;">row.ColumnName</code> syntax):</label>
+              <textarea id="business-rule-expr" placeholder="e.g. row.StartDate <= row.EndDate&#10;e.g. row.Amount > 0&#10;e.g. row.Email.includes('@')"></textarea>
+            </div>
+            <div style="font-size:0.76rem;color:#8a94a8;margin-bottom:9px;">Rows where the expression returns <strong>false</strong> are flagged as exceptions.</div>
+            <button class="btn btn-primary btn-sm" onclick="addBusinessRule()">Add Business Rule</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rules list -->
+      <div class="rules-list-wrap">
+        <div class="rules-list-title">
+          Configured Rules
+          <span class="rule-count-badge" id="rule-count-badge">0</span>
+        </div>
+        <div id="rules-list-items">
+          <div style="font-size:0.83rem;color:#8a94a8;padding:10px 0;">No rules configured yet. Use the panel above to add rules.</div>
+        </div>
+      </div>
+      <div class="step2-nav">
+        <button class="btn btn-outline" onclick="goToStep(1)">← Back</button>
+        <button class="btn btn-success" onclick="goToStep(3)">Run Assessment →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Running -->
+    <div id="dq-step-3" class="dq-step">
+      <div class="run-progress-wrap">
+        <h3>Running Assessment...</h3>
+        <p>Evaluating <span id="run-total-rules">0</span> rules against <span id="run-total-rows">0</span> records</p>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="run-progress-bar"></div>
+        </div>
+        <div class="progress-label" id="run-progress-label">Starting...</div>
+      </div>
+    </div>
+
+    <!-- Step 4: Results -->
+    <div id="dq-step-4" class="dq-step">
+      <div class="dq-summary-header">
+        <h2>Assessment Results</h2>
+        <div style="font-size:0.8rem;color:#8a94a8;" id="result-file-info"></div>
+      </div>
+      <div class="summary-kpi-row" id="summary-kpi-row"></div>
+      <div class="summary-table-wrap">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Rule Name</th><th>Dimension</th><th>Column(s)</th>
+              <th>Total Records</th><th>Exceptions</th><th>Exception %</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="summary-tbody"></tbody>
+        </table>
+      </div>
+      <div class="step4-nav">
+        <button class="btn btn-outline" onclick="goToStep(2)">← Reconfigure Rules</button>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" onclick="downloadExcel()">Download Excel Report</button>
+          <button class="btn btn-outline" onclick="resetDQ()">New Assessment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  &copy; 2026 <strong>Uniqus Consultech Private Limited</strong> &nbsp;|&nbsp; Enterprise Data Management Tool &nbsp;|&nbsp; <em>Change the way consulting is done</em>
+</footer>
+
+<!-- CDN Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+'use strict';
+
+/* ============================================================
+   SHARED: TAB SWITCHING
+============================================================ */
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ============================================================
+   MATURITY LEVELS
+============================================================ */
+const LEVELS = [
+  { min:1.0, max:1.9, label:'Initial',    color:'#c0392b',
+    rec:'The organisation is at the starting point — practices are largely unstructured and reactive. Prioritise establishing foundational policies, assigning clear ownership, and building executive awareness of data management.' },
+  { min:2.0, max:2.9, label:'Repeatable', color:'#e67e22',
+    rec:'Awareness exists but practices remain informal and inconsistent. Focus on formalising key processes, assigning accountabilities across business units, and building internal stakeholder buy-in.' },
+  { min:3.0, max:3.9, label:'Defined',    color:'#d4ac0d',
+    rec:'Processes are documented and standardised, providing a solid baseline. The next step is to strengthen enforcement, integrate practices into day-to-day operations, and begin measuring outcomes with KPIs.' },
+  { min:4.0, max:4.9, label:'Managed',    color:'#2980b9',
+    rec:'Practices are actively measured and controlled, with clear ownership and metrics in place. Continue refining KPIs, expanding coverage to additional domains, and embedding data management into strategic decisions.' },
+  { min:5.0, max:5.0, label:'Optimising', color:'#27ae60',
+    rec:'The organisation demonstrates best-in-class maturity with continuous improvement cycles embedded in practice. Maintain this standard by fostering innovation, benchmarking externally, and mentoring other teams.' },
+];
+
+function getLevel(score) {
+  if (score >= 5.0) return LEVELS[4];
+  return LEVELS.find(l => score >= l.min && score <= l.max) || LEVELS[0];
+}
+
+/* ============================================================
+   DAMA DIMENSIONS DATA (11 × 5 questions)
+============================================================ */
+const DAMA_DIMENSIONS = [
+  {
+    id: 'governance', label: 'Data Governance', color: '#482A7A',
+    questions: [
+      'Is there a formally established Data Governance body or council with defined roles and responsibilities?',
+      'Are data policies, standards, and procedures documented, approved, and communicated across the organisation?',
+      'Is there a data stewardship program with formally assigned data stewards for critical data domains?',
+      'Are data governance metrics tracked and regularly reported to executive leadership?',
+      'Is there a formal data issue resolution and escalation process in place?'
+    ]
+  },
+  {
+    id: 'quality', label: 'Data Quality', color: '#2980b9',
+    questions: [
+      'Are data quality standards and thresholds formally defined for critical data elements?',
+      'Is data profiling or quality scanning conducted regularly on key datasets?',
+      'Are data quality issues formally tracked, assigned to owners, and remediated within agreed timeframes?',
+      'Are data quality validation rules automated within data pipelines or operational systems?',
+      'Are data quality metrics and trends reported to leadership or data governance bodies?'
+    ]
+  },
+  {
+    id: 'architecture', label: 'Data Architecture', color: '#8e44ad',
+    questions: [
+      'Is there a formally documented enterprise data architecture aligned to business strategy?',
+      'Are data flows and integration patterns documented in an enterprise data flow diagram?',
+      'Is there a formal architectural review process for new data systems or significant changes?',
+      'Are data architecture standards enforced consistently across projects and business units?',
+      'Is the data architecture regularly reviewed and updated to reflect organisational changes?'
+    ]
+  },
+  {
+    id: 'modeling', label: 'Data Modeling & Design', color: '#16a085',
+    questions: [
+      'Are enterprise data models (conceptual, logical, physical) formally maintained and version-controlled?',
+      'Are naming conventions and data standards applied consistently across all data models?',
+      'Are data models reviewed and approved by architects and business stakeholders before implementation?',
+      'Is there a process to keep data models synchronised with physical database schemas?',
+      'Are data models actively used as reference during development, integration, and reporting projects?'
+    ]
+  },
+  {
+    id: 'storage', label: 'Data Storage & Operations', color: '#d35400',
+    questions: [
+      'Are data storage standards (retention, archival, disposal) formally defined and enforced?',
+      'Is there a documented backup and recovery strategy that is regularly tested for critical data assets?',
+      'Are database performance monitoring and capacity planning processes formally in place?',
+      'Is data lifecycle management (creation through disposal) formally governed and managed?',
+      'Are storage infrastructure changes managed through a formal change management process?'
+    ]
+  },
+  {
+    id: 'security', label: 'Data Security', color: '#c0392b',
+    questions: [
+      'Is there a formal data classification policy (e.g. Public, Internal, Confidential, Restricted)?',
+      'Are access controls to sensitive data enforced using role-based or attribute-based access control?',
+      'Is sensitive data masked, encrypted, or tokenised in non-production environments?',
+      'Are data access logs regularly audited and anomalies formally investigated?',
+      'Is there a formal data breach response and notification process aligned to regulatory requirements?'
+    ]
+  },
+  {
+    id: 'integration', label: 'Data Integration & Interoperability', color: '#27ae60',
+    questions: [
+      'Are data integration standards (APIs, messaging, ETL patterns) formally defined and enforced?',
+      'Is there an integration platform or API gateway managing and monitoring enterprise data flows?',
+      'Are data mappings and transformation rules documented, version-controlled, and maintained?',
+      'Is there a formal process for monitoring and alerting on data pipeline failures or latency?',
+      'Are existing integration patterns reviewed for reuse before new integrations are built?'
+    ]
+  },
+  {
+    id: 'content', label: 'Document & Content Mgmt', color: '#7f8c8d',
+    questions: [
+      'Is there a formal document management system for storing and retrieving business documents and records?',
+      'Are records retention schedules defined and enforced per regulatory and legal requirements?',
+      'Is unstructured content (emails, documents, media) classified and discoverable through search?',
+      'Are version control and audit trail capabilities in place for critical business documents?',
+      'Is there a policy for managing content lifecycle from creation through archival and disposal?'
+    ]
+  },
+  {
+    id: 'masterdata', label: 'Reference & Master Data', color: '#f39c12',
+    questions: [
+      'Are reference data (code sets, lookup values) centrally managed and distributed to consuming systems?',
+      'Is there a Master Data Management process or solution for critical entities (Customer, Product, etc.)?',
+      'Is there a golden record process with defined match and merge rules for master data entities?',
+      'Are master data changes governed through an approval workflow with a full audit trail?',
+      'Is master data quality monitored and reported regularly to stewards and data owners?'
+    ]
+  },
+  {
+    id: 'dwbi', label: 'DW & Business Intelligence', color: '#2471a3',
+    questions: [
+      'Is there a formally managed data warehouse or analytical data platform with documented architecture?',
+      'Are BI reports and dashboards developed following standards for naming, calculations, and data sources?',
+      'Is there a single source of truth for key business metrics, agreed upon by all stakeholders?',
+      'Are data warehouse and BI assets version-controlled and managed through a change control process?',
+      'Are BI adoption and usage metrics tracked and used to prioritise the development roadmap?'
+    ]
+  },
+  {
+    id: 'metadata', label: 'Metadata Management', color: '#1abc9c',
+    questions: [
+      'Is there a business glossary or data dictionary formally maintained with agreed business definitions?',
+      'Is technical metadata (schemas, lineage, data types) captured and maintained in a metadata repository?',
+      'Is data lineage documented from source systems through to analytics and reporting outputs?',
+      'Are metadata assets kept up to date as part of the formal data change management process?',
+      'Is metadata actively used for data discovery, impact analysis, and compliance reporting?'
+    ]
+  }
+];
+
+/* ============================================================
+   DAMA STATE
+============================================================ */
+// Mutable working copy of dimensions — supports add/remove questions & enable/disable
+let dimensionConfig = DAMA_DIMENSIONS.map(dim => ({
+  ...dim,
+  enabled: true,
+  questions: [...dim.questions]
+}));
+let currentDimIdx = 0;
+let lastAssessmentData = null; // stored for PDF export
+
+/* ============================================================
+   DAMA INIT — build sidebar + question panels from data
+============================================================ */
+function initDAMA() {
+  const dimList = document.getElementById('dama-dim-list');
+  const panelsContainer = document.getElementById('dama-dim-panels');
+  dimList.innerHTML = '';
+  panelsContainer.innerHTML = '';
+
+  dimensionConfig.forEach((dim, idx) => {
+    // Sidebar item with enable/disable toggle
+    const item = document.createElement('div');
+    item.className = 'dim-item' + (idx === 0 ? ' active' : '') + (!dim.enabled ? ' dim-disabled' : '');
+    item.dataset.idx = idx;
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.className = 'dim-toggle';
+    toggle.checked = dim.enabled;
+    toggle.title = 'Enable / disable this dimension';
+    toggle.onclick = (e) => { e.stopPropagation(); toggleDimension(idx, toggle.checked); };
+
+    const badge = document.createElement('span');
+    badge.className = 'dim-badge';
+    badge.style.background = dim.color;
+
+    const labelSpan = document.createElement('span');
+    labelSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;';
+    labelSpan.textContent = dim.label;
+
+    item.appendChild(toggle);
+    item.appendChild(badge);
+    item.appendChild(labelSpan);
+    item.onclick = (e) => { if (e.target !== toggle) switchDimension(idx); };
+    dimList.appendChild(item);
+
+    // Placeholder panel — will be filled by refreshDimPanel
+    const panel = document.createElement('div');
+    panel.className = 'dim-panel' + (idx === 0 ? ' active' : '');
+    panel.id = 'dim-panel-' + idx;
+    panelsContainer.appendChild(panel);
+
+    refreshDimPanel(idx, null);
+  });
+
+  updateDAMANav();
+}
+
+/* ── Capture radio answers for a dimension (before re-render) ── */
+function captureAnswers(idx) {
+  const dim = dimensionConfig[idx];
+  const saved = {};
+  dim.questions.forEach((_, qi) => {
+    const sel = document.querySelector(`input[name="${dim.id}_q${qi}"]:checked`);
+    if (sel) saved[qi] = parseInt(sel.value, 10);
+  });
+  return saved;
+}
+
+/* ── Re-render a dimension's question panel ── */
+function refreshDimPanel(idx, savedAnswers) {
+  const panel = document.getElementById('dim-panel-' + idx);
+  if (!panel) return;
+  const dim = dimensionConfig[idx];
+
+  if (!dim.enabled) {
+    panel.innerHTML = `
+      <div class="dim-disabled-msg">
+        <div class="msg-icon">⏸</div>
+        <strong>${escHtml(dim.label)} — Disabled</strong>
+        <span>Enable this dimension using the toggle in the sidebar to include it in the assessment.</span>
+      </div>`;
+    updateDAMANav();
+    return;
+  }
+
+  let html = '';
+  dim.questions.forEach((q, qi) => {
+    html += `
+      <div class="question-block">
+        <div class="question-label">
+          <span class="question-number">${qi + 1}</span>
+          <span style="flex:1">${escHtml(q)}</span>
+          <button class="question-del-btn" onclick="removeQuestion(${idx},${qi})" title="Remove this question">×</button>
+        </div>
+        <div class="options-row">
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_1" value="1">
+          <label for="${dim.id}_q${qi}_1">1 — Not at all</label>
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_2" value="2">
+          <label for="${dim.id}_q${qi}_2">2 — Ad-hoc</label>
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_3" value="3">
+          <label for="${dim.id}_q${qi}_3">3 — Partial</label>
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_4" value="4">
+          <label for="${dim.id}_q${qi}_4">4 — Largely</label>
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_5" value="5">
+          <label for="${dim.id}_q${qi}_5">5 — Full</label>
+        </div>
+      </div>`;
+  });
+
+  html += `
+    <div class="add-question-form">
+      <span class="aqf-label">Add a custom question to this dimension:</span>
+      <textarea id="add-q-text-${idx}" placeholder="Enter your question text..."></textarea>
+      <button class="btn btn-outline btn-sm" onclick="addQuestion(${idx})">+ Add Question</button>
+    </div>`;
+
+  panel.innerHTML = html;
+
+  // Restore radio selections
+  if (savedAnswers) {
+    Object.entries(savedAnswers).forEach(([qi, val]) => {
+      const radio = document.getElementById(`${dim.id}_q${parseInt(qi, 10)}_${val}`);
+      if (radio) radio.checked = true;
+    });
+  }
+  updateDAMANav();
+}
+
+/* ── Toggle dimension on/off ── */
+function toggleDimension(idx, checked) {
+  const savedAnswers = captureAnswers(idx);
+  dimensionConfig[idx].enabled = checked;
+  const sidebarItems = document.querySelectorAll('.dim-item');
+  if (sidebarItems[idx]) sidebarItems[idx].classList.toggle('dim-disabled', !checked);
+  refreshDimPanel(idx, savedAnswers);
+}
+
+/* ── Add a custom question to a dimension ── */
+function addQuestion(idx) {
+  const textarea = document.getElementById(`add-q-text-${idx}`);
+  if (!textarea) return;
+  const text = textarea.value.trim();
+  if (!text) { alert('Please enter a question text.'); textarea.focus(); return; }
+  const savedAnswers = captureAnswers(idx);
+  dimensionConfig[idx].questions.push(text);
+  textarea.value = '';
+  refreshDimPanel(idx, savedAnswers);
+}
+
+/* ── Remove a question from a dimension ── */
+function removeQuestion(idx, qi) {
+  if (dimensionConfig[idx].questions.length <= 1) {
+    alert('Each dimension must have at least one question.'); return;
+  }
+  if (!confirm('Remove this question? Any answer for it will be cleared.')) return;
+  const savedAnswers = captureAnswers(idx);
+  dimensionConfig[idx].questions.splice(qi, 1);
+  // Remap answers: shift indices down past the removed question
+  const remapped = {};
+  Object.entries(savedAnswers).forEach(([k, v]) => {
+    const n = parseInt(k, 10);
+    if (n < qi) remapped[n] = v;
+    else if (n > qi) remapped[n - 1] = v;
+  });
+  refreshDimPanel(idx, remapped);
+}
+
+function switchDimension(idx) {
+  document.querySelectorAll('.dim-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.dim-item').forEach(i => i.classList.remove('active'));
+  currentDimIdx = idx;
+  document.getElementById('dim-panel-' + idx).classList.add('active');
+  document.querySelectorAll('.dim-item')[idx].classList.add('active');
+  document.getElementById('dim-title').textContent = dimensionConfig[idx].label;
+  document.getElementById('dama-val-msg').style.display = 'none';
+  updateDAMANav();
+}
+
+function getDimScore(idx) {
+  const dim = dimensionConfig[idx];
+  if (!dim.enabled) return null;
+  const vals = dim.questions.map((_, qi) => {
+    const sel = document.querySelector(`input[name="${dim.id}_q${qi}"]:checked`);
+    return sel ? parseInt(sel.value, 10) : null;
+  });
+  if (vals.includes(null)) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
+function isDimComplete(idx) {
+  if (!dimensionConfig[idx].enabled) return true; // disabled dims are skipped, not "incomplete"
+  return getDimScore(idx) !== null;
+}
+
+function updateDAMANav() {
+  const isLast = currentDimIdx === dimensionConfig.length - 1;
+  document.getElementById('dim-progress').textContent =
+    `Dimension ${currentDimIdx + 1} of ${dimensionConfig.length}`;
+  document.getElementById('dama-next-btn').style.display = isLast ? 'none' : '';
+  document.getElementById('dama-submit-btn').style.display = isLast ? 'flex' : 'none';
+  // Update completion ticks in sidebar (only for enabled, completed dims)
+  dimensionConfig.forEach((d, idx) => {
+    const item = document.querySelectorAll('.dim-item')[idx];
+    if (item) item.classList.toggle('completed', d.enabled && isDimComplete(idx));
+  });
+}
+
+function prevDimension() {
+  if (currentDimIdx > 0) switchDimension(currentDimIdx - 1);
+}
+
+function nextDimension() {
+  if (dimensionConfig[currentDimIdx].enabled && !isDimComplete(currentDimIdx)) {
+    document.getElementById('dama-val-msg').style.display = 'block';
+    return;
+  }
+  document.getElementById('dama-val-msg').style.display = 'none';
+  if (currentDimIdx < dimensionConfig.length - 1) switchDimension(currentDimIdx + 1);
+}
+
+/* ============================================================
+   DAMA SUBMIT
+============================================================ */
+function submitDAMA() {
+  // 1. Validate mandatory client name
+  const clientNameInput = document.getElementById('client-name-input');
+  const clientName = clientNameInput ? clientNameInput.value.trim() : '';
+  const clientNameError = document.getElementById('client-name-error');
+  if (!clientName) {
+    clientNameInput.classList.add('input-error');
+    clientNameError.classList.add('visible');
+    clientNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    clientNameInput.focus();
+    return;
+  }
+  clientNameInput.classList.remove('input-error');
+  clientNameError.classList.remove('visible');
+
+  // 2. Ensure at least one dimension is enabled
+  const enabledIndices = dimensionConfig.map((d, i) => d.enabled ? i : -1).filter(i => i !== -1);
+  if (enabledIndices.length === 0) {
+    alert('Please enable at least one dimension before calculating maturity.');
+    return;
+  }
+
+  // 3. Validate all enabled dimensions are complete
+  const firstMissing = dimensionConfig.findIndex((d, i) => d.enabled && !isDimComplete(i));
+  if (firstMissing !== -1) {
+    const missing = dimensionConfig.filter((d, i) => d.enabled && !isDimComplete(i)).map(d => d.label);
+    alert(`Please complete all enabled dimensions before calculating maturity.\n\nIncomplete: ${missing.join(', ')}`);
+    switchDimension(firstMissing);
+    return;
+  }
+
+  // 4. Calculate scores for enabled dimensions only
+  const scores = enabledIndices.map(i => getDimScore(i));
+  const overallScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+
+  // Store for PDF export
+  lastAssessmentData = { scores, enabledIndices, clientName };
+
+  // 5. Show results, hide survey
+  document.getElementById('dama-survey-layout').style.display = 'none';
+  document.getElementById('dama-client-wrap').style.display = 'none';
+  const resultsEl = document.getElementById('dama-results');
+  resultsEl.classList.add('visible');
+
+  // 6. Overall score card
+  const overallLevel = getLevel(overallScore);
+  document.getElementById('dama-overall-num').textContent = overallScore.toFixed(2);
+  const badge = document.getElementById('dama-overall-badge');
+  badge.textContent = overallLevel.label;
+  badge.style.background = overallLevel.color;
+  document.getElementById('dama-overall-rec').textContent = overallLevel.rec;
+  document.getElementById('dama-display-org').textContent = clientName;
+  document.getElementById('dama-display-date').textContent =
+    new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  // 7. Dimension table (enabled dims only)
+  const tbody = document.getElementById('dama-dim-tbody');
+  tbody.innerHTML = '';
+  enabledIndices.forEach((dimIdx, si) => {
+    const dim = dimensionConfig[dimIdx];
+    const score = scores[si];
+    const level = getLevel(score);
+    const pct = ((score - 1) / 4 * 100).toFixed(1);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${dim.color};margin-right:6px;vertical-align:middle;"></span>${dim.label}</td>
+      <td><strong>${score.toFixed(2)}</strong></td>
+      <td><span class="score-pill" style="background:${level.color}">${level.label}</span></td>
+      <td><div class="mini-bar-wrap"><div class="mini-bar-fill" style="background:${level.color};width:0%" data-pct="${pct}"></div></div></td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Animate mini bars
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.querySelectorAll('.mini-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.pct + '%';
+    });
+  }));
+
+  // 8. Recommendations — bottom 3 enabled dims by score
+  const ranked = scores.map((s, si) => ({ score: s, dim: dimensionConfig[enabledIndices[si]] }))
+    .sort((a, b) => a.score - b.score);
+  const recsEl = document.getElementById('dama-recommendations');
+  recsEl.innerHTML = '';
+  ranked.slice(0, Math.min(3, ranked.length)).forEach(r => {
+    const level = getLevel(r.score);
+    const div = document.createElement('div');
+    div.className = 'rec-item';
+    div.style.borderLeftColor = r.dim.color;
+    div.innerHTML = `<div class="rec-dim">${r.dim.label} — Score: ${r.score.toFixed(2)} (${level.label})</div>${level.rec}`;
+    recsEl.appendChild(div);
+  });
+
+  // 9. Render radar (enabled dims only)
+  renderRadarChart(scores, enabledIndices.map(i => dimensionConfig[i]));
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function retakeDAMA() {
+  document.getElementById('dama-survey-layout').style.display = 'flex';
+  document.getElementById('dama-client-wrap').style.display = 'flex';
+  document.getElementById('dama-results').classList.remove('visible');
+  switchDimension(0);
+}
+
+/* ============================================================
+   SVG RADAR CHART — 11 axes
+============================================================ */
+function renderRadarChart(scores, dims) {
+  dims = dims || dimensionConfig.filter(d => d.enabled);
+  const svg = document.getElementById('dama-radar');
+  const W = 420, H = 420, cx = 210, cy = 210, maxR = 155;
+  const n = scores.length;
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs, parent) {
+    const e = document.createElementNS(ns, tag);
+    Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  function polar(idx, r) {
+    const angle = (idx / n) * 2 * Math.PI - Math.PI / 2;
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  }
+
+  // Background rings (1–5)
+  [1, 2, 3, 4, 5].forEach(level => {
+    const r = (level - 1) / 4 * maxR;
+    const pts = Array.from({ length: n }, (_, i) => {
+      const p = polar(i, r);
+      return `${p.x},${p.y}`;
+    }).join(' ');
+    el('polygon', { points: pts, fill: level % 2 === 0 ? '#F7F5F9' : 'none', stroke: '#EFE5F5', 'stroke-width': '1' }, svg);
+    // Ring level label
+    if (level > 1) {
+      const lp = polar(0, r);
+      el('text', { x: lp.x + 4, y: lp.y, 'font-size': '8', fill: '#aaa', 'font-family': 'Segoe UI,Arial,sans-serif' }, svg).textContent = level;
+    }
+  });
+
+  // Axis lines
+  scores.forEach((_, idx) => {
+    const outer = polar(idx, maxR);
+    el('line', { x1: cx, y1: cy, x2: outer.x, y2: outer.y, stroke: '#c8cedc', 'stroke-width': '1' }, svg);
+  });
+
+  // Score polygon
+  const scorePts = scores.map((s, i) => {
+    const r = (s - 1) / 4 * maxR;
+    const p = polar(i, r);
+    return `${p.x},${p.y}`;
+  }).join(' ');
+  el('polygon', { points: scorePts, fill: 'rgba(179,31,126,0.15)', stroke: '#482A7A', 'stroke-width': '2.5' }, svg);
+
+  // Score dots
+  scores.forEach((s, idx) => {
+    const r = (s - 1) / 4 * maxR;
+    const p = polar(idx, r);
+    const level = getLevel(s);
+    el('circle', { cx: p.x, cy: p.y, r: '5', fill: level.color, stroke: '#fff', 'stroke-width': '2' }, svg);
+  });
+
+  // Axis labels
+  scores.forEach((_, idx) => {
+    const outer = polar(idx, maxR + 24);
+    const label = dims[idx] ? dims[idx].label : '';
+    const words = label.split(' ');
+    const t = el('text', {
+      x: outer.x, y: outer.y,
+      'text-anchor': 'middle', 'dominant-baseline': 'middle',
+      'font-size': '9', 'font-family': 'Segoe UI,Arial,sans-serif',
+      fill: '#482A7A', 'font-weight': '600'
+    }, svg);
+
+    if (words.length <= 2) {
+      t.textContent = label;
+    } else {
+      const mid = Math.ceil(words.length / 2);
+      el('tspan', { x: outer.x, dy: '-0.55em' }, t).textContent = words.slice(0, mid).join(' ');
+      el('tspan', { x: outer.x, dy: '1.1em' }, t).textContent = words.slice(mid).join(' ');
+    }
+  });
+
+  // Centre overall score
+  const overall = scores.reduce((a, b) => a + b, 0) / scores.length;
+  el('text', { x: cx, y: cy - 9, 'text-anchor': 'middle', 'font-size': '22', 'font-weight': '800', fill: '#482A7A', 'font-family': 'Segoe UI,Arial,sans-serif' }, svg).textContent = overall.toFixed(1);
+  el('text', { x: cx, y: cy + 11, 'text-anchor': 'middle', 'font-size': '8.5', fill: '#8a94a8', 'font-weight': '700', 'font-family': 'Segoe UI,Arial,sans-serif', 'letter-spacing': '0.08em' }, svg).textContent = 'OVERALL';
+}
+
+/* ============================================================
+   DAMA PDF EXPORT
+============================================================ */
+async function exportDamaPDF() {
+  const btn = document.getElementById('pdf-export-btn');
+  const origText = btn.textContent;
+  btn.textContent = 'Generating PDF...';
+  btn.disabled = true;
+
+  try {
+    if (!window.jspdf) throw new Error('jsPDF library not loaded. Please check your internet connection.');
+    if (!lastAssessmentData) throw new Error('No assessment data found. Please run the assessment first.');
+
+    const { jsPDF } = window.jspdf;
+    const { scores, enabledIndices, clientName } = lastAssessmentData;
+    const enabledDims = enabledIndices.map(i => dimensionConfig[i]);
+    const n = scores.length;
+    const overallScore = scores.reduce((a, b) => a + b, 0) / n;
+    const overallLevel = getLevel(overallScore);
+    const dateStr = document.getElementById('dama-display-date').textContent;
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const W = 297, H = 210;
+
+    // ── Utility: hex colour → [r,g,b] ─────────────────────────────
+    function hexRgb(hex) {
+      hex = (hex || '#888888').replace('#', '');
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+    }
+
+    // ── Header bar (drawn on every page) ──────────────────────────
+    function drawHeader(subtitle) {
+      doc.setFillColor(72, 42, 122);
+      doc.rect(0, 0, W, 18, 'F');
+      doc.setFillColor(179, 31, 126);
+      doc.rect(W * 0.6, 0, W * 0.4, 18, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.5);
+      doc.text('Uniqus Consultech — DAMA Maturity Assessment', 12, 11.5);
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${clientName}  |  ${dateStr}`, W - 12, 11.5, { align: 'right' });
+      // Subtitle
+      doc.setTextColor(72, 42, 122);
+      doc.setFontSize(9.5);
+      doc.setFont('helvetica', 'bold');
+      doc.text(subtitle, 12, 27);
+    }
+
+    // ── Draw radar chart using jsPDF native drawing ────────────────
+    function drawRadarChart(cx, cy, maxR) {
+      if (n === 0) return;
+      function polar(idx, r) {
+        const angle = (idx / n) * 2 * Math.PI - Math.PI / 2;
+        return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+      }
+
+      // Background rings
+      [1, 2, 3, 4, 5].forEach(lvl => {
+        const r = (lvl - 1) / 4 * maxR;
+        if (r < 0.5) return;
+        const ring = Array.from({ length: n }, (_, i) => polar(i, r));
+        doc.setDrawColor(220, 215, 235);
+        doc.setLineWidth(0.25);
+        if (lvl % 2 === 0) doc.setFillColor(247, 245, 251); else doc.setFillColor(255, 255, 255);
+        const rel = [];
+        for (let i = 1; i < ring.length; i++) {
+          rel.push([ring[i][0] - ring[i-1][0], ring[i][1] - ring[i-1][1]]);
+        }
+        doc.lines(rel, ring[0][0], ring[0][1], [1, 1], lvl % 2 === 0 ? 'FD' : 'S', true);
+        if (lvl > 1) {
+          const lp = polar(0, r);
+          doc.setFontSize(4); doc.setTextColor(180, 180, 190); doc.setFont('helvetica', 'normal');
+          doc.text(String(lvl), lp[0] + 0.8, lp[1] + 0.5);
+        }
+      });
+
+      // Axis lines
+      doc.setDrawColor(205, 210, 225); doc.setLineWidth(0.25);
+      scores.forEach((_, idx) => {
+        const outer = polar(idx, maxR);
+        doc.line(cx, cy, outer[0], outer[1]);
+      });
+
+      // Score polygon (filled)
+      const scorePts = scores.map((s, i) => { const r = Math.max(0.5, (s - 1) / 4 * maxR); return polar(i, r); });
+      doc.setFillColor(242, 225, 248);
+      doc.setDrawColor(72, 42, 122);
+      doc.setLineWidth(0.7);
+      const relScore = [];
+      for (let i = 1; i < scorePts.length; i++) {
+        relScore.push([scorePts[i][0] - scorePts[i-1][0], scorePts[i][1] - scorePts[i-1][1]]);
+      }
+      doc.lines(relScore, scorePts[0][0], scorePts[0][1], [1, 1], 'FD', true);
+
+      // Score dots
+      scores.forEach((s, idx) => {
+        const r = Math.max(0.5, (s - 1) / 4 * maxR);
+        const p = polar(idx, r);
+        const [cr, cg, cb] = hexRgb(getLevel(s).color);
+        doc.setFillColor(cr, cg, cb);
+        doc.setDrawColor(255, 255, 255);
+        doc.setLineWidth(0.5);
+        doc.circle(p[0], p[1], 1.6, 'FD');
+      });
+
+      // Axis labels
+      enabledDims.forEach((dim, idx) => {
+        const outer = polar(idx, maxR + 9);
+        doc.setFontSize(5); doc.setFont('helvetica', 'bold'); doc.setTextColor(72, 42, 122);
+        const words = dim.label.split(' ');
+        if (words.length <= 2) {
+          doc.text(dim.label, outer[0], outer[1], { align: 'center', baseline: 'middle' });
+        } else {
+          const mid = Math.ceil(words.length / 2);
+          doc.text(words.slice(0, mid).join(' '), outer[0], outer[1] - 1.6, { align: 'center' });
+          doc.text(words.slice(mid).join(' '), outer[0], outer[1] + 1.6, { align: 'center' });
+        }
+      });
+
+      // Centre overall score
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(72, 42, 122);
+      doc.text(overallScore.toFixed(1), cx, cy - 1.5, { align: 'center' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(4.5); doc.setTextColor(138, 148, 168);
+      doc.text('OVERALL', cx, cy + 3.5, { align: 'center' });
+    }
+
+    // ══════════════════════════════════════════════════
+    // PAGE 1 — Overview (score + radar side by side)
+    // ══════════════════════════════════════════════════
+    drawHeader('Assessment Overview');
+
+    // Overall score box
+    doc.setFillColor(72, 42, 122);
+    doc.rect(12, 32, 90, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.text(overallScore.toFixed(2), 22, 49);
+    doc.setFontSize(8);
+    doc.text('/ 5.00  —  Overall Maturity', 48, 49);
+    // Level badge
+    const [lr, lg, lb] = hexRgb(overallLevel.color);
+    doc.setFillColor(lr, lg, lb);
+    doc.roundedRect(22, 53, 35, 6.5, 3, 3, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7.5);
+    doc.text(overallLevel.label, 39.5, 57.5, { align: 'center' });
+
+    // Client info below score box
+    doc.setTextColor(60, 60, 90);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+    doc.text('Client:', 12, 70);
+    doc.setFont('helvetica', 'normal');
+    doc.text(clientName, 30, 70);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Date:', 12, 76);
+    doc.setFont('helvetica', 'normal');
+    doc.text(dateStr, 30, 76);
+
+    // Recommendation text
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(7.5); doc.setTextColor(70, 70, 100);
+    const recLines = doc.splitTextToSize(overallLevel.rec, 95);
+    let ry = 84;
+    recLines.slice(0, 5).forEach(line => { doc.text(line, 12, ry); ry += 4.3; });
+
+    // Radar chart (right half of page)
+    drawRadarChart(210, 120, 63);
+
+    // ══════════════════════════════════════════════════
+    // PAGE 2 — Dimension Scores Table
+    // ══════════════════════════════════════════════════
+    doc.addPage();
+    drawHeader('Dimension Scores');
+
+    let ty = 36;
+    // Table header row
+    doc.setFillColor(237, 229, 245);
+    doc.rect(12, ty - 5, W - 24, 8, 'F');
+    doc.setTextColor(72, 42, 122);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+    doc.text('Knowledge Area', 15, ty);
+    doc.text('Score', 148, ty);
+    doc.text('Level', 170, ty);
+    doc.text('Progress', 210, ty);
+    doc.text('Status', 272, ty);
+    ty += 7;
+
+    dimensionConfig.forEach((dim, idx) => {
+      if (ty > 196) { doc.addPage(); drawHeader('Dimension Scores (cont.)'); ty = 36; }
+      if (idx % 2 === 0) { doc.setFillColor(249, 247, 252); doc.rect(12, ty - 4.5, W - 24, 8, 'F'); }
+      const enabled = dim.enabled;
+      const score = enabled ? getDimScore(idx) : null;
+      // Colour dot
+      const [dr, dg, db] = hexRgb(dim.color);
+      doc.setFillColor(enabled ? dr : 180, enabled ? dg : 180, enabled ? db : 180);
+      doc.circle(15, ty - 1.5, 1.6, 'F');
+      doc.setTextColor(enabled ? 40 : 160, enabled ? 40 : 160, enabled ? 60 : 160);
+      doc.setFont('helvetica', enabled ? 'normal' : 'italic'); doc.setFontSize(7.5);
+      doc.text(dim.label, 19, ty);
+      if (enabled && score !== null) {
+        doc.setFont('helvetica', 'bold');
+        doc.text(score.toFixed(2), 148, ty);
+        const lv = getLevel(score); const [pvr, pvg, pvb] = hexRgb(lv.color);
+        doc.setFillColor(pvr, pvg, pvb);
+        doc.roundedRect(168, ty - 4.5, 30, 6, 2, 2, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFontSize(6.5);
+        doc.text(lv.label, 183, ty - 0.5, { align: 'center' });
+        // Progress bar
+        const bw = (score - 1) / 4 * 55;
+        doc.setFillColor(225, 218, 240); doc.rect(208, ty - 3.5, 55, 4, 'F');
+        doc.setFillColor(pvr, pvg, pvb); doc.rect(208, ty - 3.5, bw, 4, 'F');
+        doc.setTextColor(39, 163, 85); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+        doc.text('Assessed', 272, ty);
+      } else {
+        doc.setTextColor(170, 170, 180); doc.setFont('helvetica', 'italic'); doc.setFontSize(7);
+        doc.text('Disabled', 148, ty);
+        doc.text('—', 272, ty);
+      }
+      ty += 8;
+    });
+
+    // ══════════════════════════════════════════════════
+    // PAGE 3+ — Client Responses
+    // ══════════════════════════════════════════════════
+    doc.addPage();
+    drawHeader('Client Responses');
+    ty = 34;
+
+    const answerLabels = ['', '1 — Not at all', '2 — Ad-hoc', '3 — Partial', '4 — Largely', '5 — Fully implemented'];
+
+    enabledIndices.forEach((dimIdx, si) => {
+      const dim = dimensionConfig[dimIdx];
+      const score = scores[si];
+      const level = getLevel(score);
+      const [dr, dg, db] = hexRgb(dim.color);
+
+      if (ty > 175) { doc.addPage(); drawHeader('Client Responses (cont.)'); ty = 34; }
+
+      // Dimension heading bar
+      doc.setFillColor(dr, dg, db);
+      doc.rect(12, ty - 4, W - 24, 9, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
+      doc.text(dim.label, 15, ty + 1.5);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+      doc.text(`Score: ${score.toFixed(2)} — ${level.label}`, W - 15, ty + 1.5, { align: 'right' });
+      ty += 13;
+
+      dim.questions.forEach((q, qi) => {
+        const sel = document.querySelector(`input[name="${dim.id}_q${qi}"]:checked`);
+        const answerVal = sel ? parseInt(sel.value, 10) : null;
+        const answerText = answerVal ? answerLabels[answerVal] : 'Not answered';
+
+        if (ty > 190) { doc.addPage(); drawHeader('Client Responses (cont.)'); ty = 34; }
+
+        // Question
+        doc.setTextColor(50, 50, 80); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+        const qLines = doc.splitTextToSize(`Q${qi + 1}: ${q}`, W - 55);
+        qLines.forEach(line => {
+          if (ty > 190) { doc.addPage(); drawHeader('Client Responses (cont.)'); ty = 34; }
+          doc.text(line, 16, ty); ty += 4;
+        });
+
+        // Answer
+        if (answerVal) {
+          const [ar, ag, ab] = hexRgb(getLevel(answerVal).color);
+          doc.setTextColor(ar, ag, ab);
+        } else {
+          doc.setTextColor(160, 160, 160);
+        }
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+        doc.text(`Answer: ${answerText}`, 20, ty);
+        ty += 7;
+      });
+
+      ty += 5; // gap between dimensions
+    });
+
+    const safeClient = clientName.replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 40);
+    const fileName = `DAMA_Maturity_${safeClient}_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+
+  } catch (e) {
+    console.error(e);
+    alert('PDF export failed: ' + e.message);
+  } finally {
+    btn.textContent = origText;
+    btn.disabled = false;
+  }
+}
+
+/* ============================================================
+   DQ STATE
+============================================================ */
+let parsedData = [];
+let columns = [];
+let selectedColumn = null;
+let configuredRules = [];
+let assessmentResults = [];
+let currentFileName = '';
+let ruleIdCounter = 1;
+
+/* ============================================================
+   DQ: STEP NAVIGATION
+============================================================ */
+function goToStep(n) {
+  if (n === 3) {
+    if (configuredRules.length === 0) {
+      alert('Please configure at least one rule before running the assessment.');
+      return;
+    }
+    showStep(3);
+    runAssessment();
+    return;
+  }
+  showStep(n);
+}
+
+function showStep(n) {
+  document.querySelectorAll('.dq-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('dq-step-' + n).classList.add('active');
+  for (let i = 1; i <= 4; i++) {
+    const stepEl = document.getElementById('step-ind-' + i);
+    stepEl.classList.remove('active', 'done');
+    if (i < n) stepEl.classList.add('done');
+    else if (i === n) stepEl.classList.add('active');
+  }
+  for (let i = 1; i <= 3; i++) {
+    const conn = document.getElementById('conn-' + i);
+    if (conn) conn.classList.toggle('done', i < n);
+  }
+}
+
+/* ============================================================
+   DQ: FILE UPLOAD
+============================================================ */
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+
+function handleFileInputChange(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+}
+
+function processFile(file) {
+  currentFileName = file.name;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      let data;
+      if (ext === 'csv') {
+        const wb = XLSX.read(e.target.result, { type: 'string' });
+        data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+      } else {
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+      }
+      parsedData = data;
+      columns = data.length > 0 ? Object.keys(data[0]) : [];
+      renderPreviewTable();
+      renderColumnList();
+      document.getElementById('file-info-bar').classList.add('visible');
+      document.getElementById('file-info-text').textContent =
+        `${file.name} — ${data.length.toLocaleString()} rows, ${columns.length} columns loaded`;
+      document.getElementById('step1-next-btn').disabled = false;
+      document.getElementById('drop-zone').style.display = 'none';
+    } catch (err) {
+      alert('Error reading file: ' + err.message);
+    }
+  };
+  if (ext === 'csv') reader.readAsText(file);
+  else reader.readAsArrayBuffer(file);
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function renderPreviewTable() {
+  const preview = parsedData.slice(0, 10);
+  const table = document.getElementById('preview-table');
+  let html = '<thead><tr>' + columns.map(c => `<th>${escHtml(c)}</th>`).join('') + '</tr></thead><tbody>';
+  preview.forEach(row => {
+    html += '<tr>' + columns.map(c => `<td title="${escHtml(String(row[c] ?? ''))}">${escHtml(String(row[c] ?? '').substring(0, 40))}</td>`).join('') + '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+  document.getElementById('preview-wrap').classList.add('visible');
+}
+
+/* ============================================================
+   DQ: COLUMN LIST
+============================================================ */
+function renderColumnList() {
+  const list = document.getElementById('col-list');
+  list.innerHTML = '';
+  columns.forEach(col => {
+    const item = document.createElement('div');
+    item.className = 'col-list-item';
+    item.textContent = col;
+    item.title = col;
+    item.onclick = () => selectColumn(col);
+    list.appendChild(item);
+  });
+  if (columns.length > 0) selectColumn(columns[0]);
+}
+
+function selectColumn(col) {
+  selectedColumn = col;
+  document.querySelectorAll('.col-list-item').forEach(i => {
+    i.classList.toggle('selected', i.textContent === col);
+  });
+  document.getElementById('selected-col-label').textContent = `Configuring rules for column: ${col}`;
+  refreshUniquenessCheckboxes();
+}
+
+function refreshUniquenessCheckboxes() {
+  const wrap = document.getElementById('uniqueness-col-checkboxes');
+  wrap.innerHTML = '';
+  columns.filter(c => c !== selectedColumn).forEach(col => {
+    const lbl = document.createElement('label');
+    lbl.innerHTML = `<input type="checkbox" value="${escHtml(col)}"> ${escHtml(col)}`;
+    wrap.appendChild(lbl);
+  });
+}
+
+/* ============================================================
+   DQ: RULE TAB SWITCHING
+============================================================ */
+function switchRuleTab(tab, btn) {
+  document.querySelectorAll('.rule-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.rule-tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('rule-tab-' + tab).classList.add('active');
+}
+
+// Fuzzy threshold show/hide
+document.querySelectorAll('input[name="match-type"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('fuzzy-threshold-wrap').style.display =
+      document.querySelector('input[name="match-type"][value="fuzzy"]').checked ? 'block' : 'none';
+  });
+});
+
+/* ============================================================
+   DQ: ADD RULES
+============================================================ */
+function addUniquenessRule() {
+  if (!selectedColumn) { alert('Select a column first.'); return; }
+  const matchType = document.querySelector('input[name="match-type"]:checked').value;
+  const extraCols = [...document.querySelectorAll('#uniqueness-col-checkboxes input:checked')].map(c => c.value);
+  const allCols = [selectedColumn, ...extraCols];
+  const threshold = parseInt(document.getElementById('fuzzy-slider').value, 10);
+  const ruleType = matchType === 'fuzzy' ? 'fuzzy-dup' : 'exact-dup';
+  const label = `${matchType === 'fuzzy' ? 'Fuzzy' : 'Exact'} duplicate: ${allCols.join(' + ')}${matchType === 'fuzzy' ? ` (${threshold}% threshold)` : ''}`;
+  configuredRules.push({ id: 'rule-' + (ruleIdCounter++), dimension: 'Uniqueness', columns: allCols, type: ruleType, threshold, label });
+  renderRulesList();
+}
+
+function addCompletenessRule() {
+  if (!selectedColumn) { alert('Select a column first.'); return; }
+  configuredRules.push({
+    id: 'rule-' + (ruleIdCounter++),
+    dimension: 'Completeness',
+    columns: [selectedColumn],
+    type: 'null-check',
+    label: `Completeness: ${selectedColumn} must not be empty`
+  });
+  renderRulesList();
+}
+
+function addStandardisationRules() {
+  if (!selectedColumn) { alert('Select a column first.'); return; }
+  const checks = [...document.querySelectorAll('#std-checkboxes input[type="checkbox"]:checked')];
+  if (checks.length === 0) { alert('Select at least one standardisation rule.'); return; }
+  checks.forEach(cb => {
+    const type = cb.value;
+    let extra = {}, label = '';
+    if (type === 'date-format') {
+      extra.format = document.getElementById('date-format-input').value.trim() || 'YYYY-MM-DD';
+      label = `Standardisation: ${selectedColumn} date format (${extra.format})`;
+    } else if (type === 'max-length') {
+      extra.length = parseInt(document.getElementById('max-length-input').value, 10) || 50;
+      label = `Standardisation: ${selectedColumn} max length ${extra.length}`;
+    } else if (type === 'min-length') {
+      extra.length = parseInt(document.getElementById('min-length-input').value, 10) || 1;
+      label = `Standardisation: ${selectedColumn} min length ${extra.length}`;
+    } else {
+      label = `Standardisation: ${selectedColumn} — ${type.replace(/-/g, ' ')}`;
+    }
+    configuredRules.push({ id: 'rule-' + (ruleIdCounter++), dimension: 'Standardisation', columns: [selectedColumn], type, label, ...extra });
+  });
+  renderRulesList();
+}
+
+function addValidationRule(type) {
+  if (!selectedColumn) { alert('Select a column first.'); return; }
+  let rule;
+  if (type === 'allowed-values') {
+    const raw = document.getElementById('allowed-values-input').value.trim();
+    if (!raw) { alert('Enter at least one allowed value.'); return; }
+    const values = raw.split(',').map(v => v.trim()).filter(Boolean);
+    rule = { id: 'rule-' + (ruleIdCounter++), dimension: 'Validation', columns: [selectedColumn], type: 'allowed-values', values, label: `Validation: ${selectedColumn} in [${values.join(', ')}]` };
+  } else {
+    const minVal = document.getElementById('range-min-input').value;
+    const maxVal = document.getElementById('range-max-input').value;
+    if (minVal === '' && maxVal === '') { alert('Enter at least a min or max value.'); return; }
+    rule = {
+      id: 'rule-' + (ruleIdCounter++), dimension: 'Validation', columns: [selectedColumn], type: 'numeric-range',
+      min: minVal !== '' ? parseFloat(minVal) : null,
+      max: maxVal !== '' ? parseFloat(maxVal) : null,
+      label: `Validation: ${selectedColumn} range [${minVal || '-∞'}, ${maxVal || '+∞'}]`
+    };
+  }
+  configuredRules.push(rule);
+  renderRulesList();
+}
+
+function addBusinessRule() {
+  const name = document.getElementById('business-rule-name').value.trim();
+  const expr = document.getElementById('business-rule-expr').value.trim();
+  if (!name) { alert('Enter a rule name.'); return; }
+  if (!expr) { alert('Enter a rule expression.'); return; }
+  try { new Function('row', `return !!(${expr})`); } catch (e) { alert('Invalid expression syntax: ' + e.message); return; }
+  configuredRules.push({ id: 'rule-' + (ruleIdCounter++), dimension: 'Business Rules', columns: [], type: 'js-expression', expr, label: name });
+  document.getElementById('business-rule-name').value = '';
+  document.getElementById('business-rule-expr').value = '';
+  renderRulesList();
+}
+
+function addFormatCheckRule(format) {
+  if (!selectedColumn) { alert('Select a column from the left panel first.'); return; }
+  const labels = { email: 'Email format', pan: 'PAN (India) format', gst: 'GST (India) format' };
+  configuredRules.push({
+    id: 'rule-' + (ruleIdCounter++),
+    dimension: 'Validation',
+    columns: [selectedColumn],
+    type: 'format-check',
+    format,
+    label: `Validation: ${selectedColumn} — ${labels[format] || format}`
+  });
+  renderRulesList();
+}
+
+function deleteRule(id) {
+  configuredRules = configuredRules.filter(r => r.id !== id);
+  renderRulesList();
+}
+
+function renderRulesList() {
+  const container = document.getElementById('rules-list-items');
+  document.getElementById('rule-count-badge').textContent = configuredRules.length;
+  if (configuredRules.length === 0) {
+    container.innerHTML = '<div style="font-size:0.83rem;color:#8a94a8;padding:10px 0;">No rules configured yet.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  configuredRules.forEach(rule => {
+    const div = document.createElement('div');
+    div.className = 'rule-entry';
+    div.innerHTML = `
+      <span class="rule-entry-dim">${escHtml(rule.dimension)}</span>
+      <span class="rule-entry-label">${escHtml(rule.label)}</span>
+      <button class="rule-entry-del" onclick="deleteRule('${rule.id}')" title="Remove rule">✕</button>`;
+    container.appendChild(div);
+  });
+}
+
+/* ============================================================
+   DQ: ASSESSMENT ENGINE
+============================================================ */
+function levenshteinSimilarity(a, b) {
+  const la = a.length, lb = b.length;
+  if (!la && !lb) return 1;
+  if (!la || !lb) return 0;
+  const dp = [];
+  for (let i = 0; i <= la; i++) { dp[i] = []; dp[i][0] = i; }
+  for (let j = 0; j <= lb; j++) dp[0][j] = j;
+  for (let i = 1; i <= la; i++) {
+    for (let j = 1; j <= lb; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return 1 - dp[la][lb] / Math.max(la, lb);
+}
+
+function checkExactDups(rule) {
+  const seen = new Map();
+  parsedData.forEach((row, idx) => {
+    const key = rule.columns.map(c => String(row[c] ?? '')).join('|||');
+    if (!seen.has(key)) seen.set(key, []);
+    seen.get(key).push(idx);
+  });
+  const exceptions = [];
+  seen.forEach(indices => { if (indices.length > 1) indices.forEach(i => exceptions.push(parsedData[i])); });
+  return exceptions;
+}
+
+function checkFuzzyDups(rule) {
+  const vals = parsedData.map(r => rule.columns.map(c => String(r[c] ?? '')).join('|'));
+  const threshold = (rule.threshold || 85) / 100;
+  const flagged = new Set();
+  for (let i = 0; i < vals.length; i++) {
+    for (let j = i + 1; j < vals.length; j++) {
+      if (levenshteinSimilarity(vals[i], vals[j]) >= threshold) {
+        flagged.add(i); flagged.add(j);
+      }
+    }
+  }
+  return [...flagged].map(i => parsedData[i]);
+}
+
+function passesRule(row, rule) {
+  const col = rule.columns[0];
+  const val = row[col];
+  const str = String(val ?? '');
+  switch (rule.type) {
+    case 'null-check':      return val !== null && val !== undefined && str.trim() !== '';
+    case 'no-special-chars': return /^[a-zA-Z0-9\s]*$/.test(str);
+    case 'uppercase':        return str === str.toUpperCase();
+    case 'lowercase':        return str === str.toLowerCase();
+    case 'numeric-only':     return /^[0-9.+-]*$/.test(str);
+    case 'date-format': {
+      const fmt = rule.format || 'YYYY-MM-DD';
+      if (fmt === 'YYYY-MM-DD') return /^\d{4}-\d{2}-\d{2}$/.test(str);
+      if (fmt === 'DD/MM/YYYY') return /^\d{2}\/\d{2}\/\d{4}$/.test(str);
+      if (fmt === 'MM/DD/YYYY') return /^\d{2}\/\d{2}\/\d{4}$/.test(str);
+      return !isNaN(Date.parse(str));
+    }
+    case 'max-length': return str.length <= rule.length;
+    case 'min-length': return str.length >= rule.length;
+    case 'allowed-values': return rule.values.includes(str);
+    case 'numeric-range': {
+      const n = parseFloat(val);
+      if (isNaN(n)) return false;
+      if (rule.min !== null && n < rule.min) return false;
+      if (rule.max !== null && n > rule.max) return false;
+      return true;
+    }
+    case 'js-expression': {
+      try { return !!(new Function('row', `return !!(${rule.expr})`)(row)); }
+      catch (e) { return false; }
+    }
+    case 'format-check': {
+      const patterns = {
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        pan:   /^[A-Z]{5}[0-9]{4}[A-Z]$/,
+        gst:   /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/
+      };
+      const pattern = patterns[rule.format];
+      return pattern ? pattern.test(str) : true;
+    }
+    default: return true;
+  }
+}
+
+async function runAssessment() {
+  const totalRules = configuredRules.length;
+  const totalRows = parsedData.length;
+  document.getElementById('run-total-rules').textContent = totalRules;
+  document.getElementById('run-total-rows').textContent = totalRows.toLocaleString();
+  document.getElementById('run-progress-bar').style.width = '0%';
+  document.getElementById('run-progress-label').textContent = 'Starting...';
+  assessmentResults = [];
+
+  // Warn for fuzzy + large files
+  const hasFuzzy = configuredRules.some(r => r.type === 'fuzzy-dup');
+  if (hasFuzzy && totalRows > 5000) {
+    const proceed = confirm(`Warning: Fuzzy duplicate checking on ${totalRows.toLocaleString()} rows is O(n²) and may take a long time. Proceed?`);
+    if (!proceed) { showStep(2); return; }
+  }
+
+  for (let i = 0; i < configuredRules.length; i++) {
+    const rule = configuredRules[i];
+    document.getElementById('run-progress-label').textContent = `Evaluating: ${rule.label}`;
+    document.getElementById('run-progress-bar').style.width = Math.round(i / totalRules * 100) + '%';
+
+    let exceptions = [];
+    if (rule.type === 'exact-dup') exceptions = checkExactDups(rule);
+    else if (rule.type === 'fuzzy-dup') exceptions = checkFuzzyDups(rule);
+    else exceptions = parsedData.filter(row => !passesRule(row, rule));
+
+    assessmentResults.push({ rule, total: totalRows, exceptions });
+    await new Promise(r => setTimeout(r, 0)); // yield to browser
+  }
+
+  document.getElementById('run-progress-bar').style.width = '100%';
+  document.getElementById('run-progress-label').textContent = 'Assessment complete!';
+  setTimeout(() => { renderSummaryTable(); showStep(4); }, 500);
+}
+
+/* ============================================================
+   DQ: RESULTS
+============================================================ */
+function renderSummaryTable() {
+  document.getElementById('result-file-info').textContent =
+    `File: ${currentFileName}  —  ${parsedData.length.toLocaleString()} records`;
+
+  const passCount = assessmentResults.filter(r => r.exceptions.length === 0).length;
+  const failCount = assessmentResults.length - passCount;
+  const totalEx = assessmentResults.reduce((a, r) => a + r.exceptions.length, 0);
+
+  document.getElementById('summary-kpi-row').innerHTML = `
+    <div class="kpi-card"><div class="kpi-val">${assessmentResults.length}</div><div class="kpi-label">TOTAL RULES</div></div>
+    <div class="kpi-card"><div class="kpi-val pass">${passCount}</div><div class="kpi-label">PASSED</div></div>
+    <div class="kpi-card"><div class="kpi-val fail">${failCount}</div><div class="kpi-label">FAILED</div></div>
+    <div class="kpi-card"><div class="kpi-val">${totalEx.toLocaleString()}</div><div class="kpi-label">TOTAL EXCEPTIONS</div></div>`;
+
+  const tbody = document.getElementById('summary-tbody');
+  tbody.innerHTML = '';
+  assessmentResults.forEach((r, idx) => {
+    const exPct = r.total > 0 ? ((r.exceptions.length / r.total) * 100).toFixed(1) : '0.0';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${idx + 1}</td>
+      <td>${escHtml(r.rule.label)}</td>
+      <td>${escHtml(r.rule.dimension)}</td>
+      <td>${escHtml(r.rule.columns.join(', ') || '—')}</td>
+      <td>${r.total.toLocaleString()}</td>
+      <td><strong>${r.exceptions.length.toLocaleString()}</strong></td>
+      <td>${exPct}%</td>
+      <td><span class="${r.exceptions.length === 0 ? 'status-pass' : 'status-fail'}">${r.exceptions.length === 0 ? 'PASS' : 'FAIL'}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ============================================================
+   DQ: EXCEL EXPORT
+============================================================ */
+function downloadExcel() {
+  if (!window.XLSX) { alert('SheetJS library not loaded. Check your internet connection.'); return; }
+  const wb = XLSX.utils.book_new();
+
+  // Summary sheet
+  const summaryRows = [
+    ['#', 'Rule Name', 'Dimension', 'Column(s)', 'Total Records', 'Exceptions', 'Exception %', 'Status'],
+    ...assessmentResults.map((r, idx) => [
+      idx + 1,
+      r.rule.label,
+      r.rule.dimension,
+      r.rule.columns.join('+') || '—',
+      r.total,
+      r.exceptions.length,
+      r.total > 0 ? ((r.exceptions.length / r.total) * 100).toFixed(1) + '%' : '0.0%',
+      r.exceptions.length === 0 ? 'PASS' : 'FAIL'
+    ])
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryRows), 'Summary');
+
+  // Per-rule exception sheets (only for failures)
+  assessmentResults.forEach((r, idx) => {
+    if (r.exceptions.length > 0) {
+      const ws = XLSX.utils.json_to_sheet(r.exceptions);
+      const sheetName = `${idx + 1}_${r.rule.label}`.replace(/[:\\/?*\[\]]/g, '').substring(0, 31);
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    }
+  });
+
+  const baseName = currentFileName.split('.').slice(0, -1).join('.') || 'data';
+  XLSX.writeFile(wb, `DQ_Assessment_${baseName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
+/* ============================================================
+   DQ: RESET
+============================================================ */
+function resetDQ() {
+  parsedData = []; columns = []; selectedColumn = null;
+  configuredRules = []; assessmentResults = []; currentFileName = ''; ruleIdCounter = 1;
+  document.getElementById('file-info-bar').classList.remove('visible');
+  document.getElementById('preview-wrap').classList.remove('visible');
+  document.getElementById('drop-zone').style.display = '';
+  document.getElementById('step1-next-btn').disabled = true;
+  document.getElementById('file-input').value = '';
+  document.getElementById('col-list').innerHTML = '';
+  renderRulesList();
+  showStep(1);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+initDAMA();
+</script>
+</body>
+</html>
