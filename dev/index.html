@@ -272,6 +272,9 @@
     .add-question-form textarea { width: 100%; padding: 7px 10px; border: 1px solid #c8cedc; border-radius: 6px; font-size: 0.84rem; font-family: inherit; min-height: 54px; resize: vertical; outline: none; margin-bottom: 8px; }
     .add-question-form textarea:focus { border-color: #482A7A; }
 
+    /* Required notice on enabled dimension panels */
+    .dim-required-notice { font-size: 0.77rem; font-weight: 600; color: #5d3699; background: #EDE5F5; border-left: 3px solid #482A7A; border-radius: 0 5px 5px 0; padding: 6px 12px; margin-bottom: 16px; }
+
     /* Disabled dimension placeholder */
     .dim-disabled-msg { text-align: center; padding: 55px 20px; color: #8a94a8; }
     .dim-disabled-msg .msg-icon { font-size: 2.2rem; margin-bottom: 10px; }
@@ -364,9 +367,6 @@
           <button class="btn btn-success" onclick="submitDAMA()" id="dama-submit-btn" style="display:none;padding:13px 38px;font-size:0.97rem;">
             Calculate Maturity →
           </button>
-        </div>
-        <div id="dama-val-msg" style="color:#c0392b;font-size:0.83rem;font-weight:600;text-align:center;margin-top:7px;display:none;">
-          Please answer all questions for this dimension before proceeding.
         </div>
       </div>
     </div>
@@ -887,7 +887,7 @@ function refreshDimPanel(idx, savedAnswers) {
     return;
   }
 
-  let html = '';
+  let html = '<div class="dim-required-notice">Toggle is ON — all questions in this dimension are required for scoring.</div>';
   dim.questions.forEach((q, qi) => {
     html += `
       <div class="question-block">
@@ -976,7 +976,6 @@ function switchDimension(idx) {
   document.getElementById('dim-panel-' + idx).classList.add('active');
   document.querySelectorAll('.dim-item')[idx].classList.add('active');
   document.getElementById('dim-title').textContent = dimensionConfig[idx].label;
-  document.getElementById('dama-val-msg').style.display = 'none';
   updateDAMANav();
 }
 
@@ -1014,11 +1013,6 @@ function prevDimension() {
 }
 
 function nextDimension() {
-  if (dimensionConfig[currentDimIdx].enabled && !isDimComplete(currentDimIdx)) {
-    document.getElementById('dama-val-msg').style.display = 'block';
-    return;
-  }
-  document.getElementById('dama-val-msg').style.display = 'none';
   if (currentDimIdx < dimensionConfig.length - 1) switchDimension(currentDimIdx + 1);
 }
 
