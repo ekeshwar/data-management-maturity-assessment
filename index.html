@@ -245,6 +245,39 @@
     .status-fail { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.74rem; font-weight: 700; background: #fdecea; color: #c0392b; }
     .step4-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; flex-wrap: wrap; gap: 10px; }
 
+    /* Client name mandatory */
+    .client-name-wrap { background: #EDE5F5; border: 2px solid #482A7A; border-radius: 10px; padding: 14px 22px; margin: 20px 0 0; display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+    .client-name-wrap label { font-size: 0.9rem; font-weight: 700; color: #482A7A; white-space: nowrap; padding-top: 8px; }
+    .client-name-wrap input[type="text"] { width: 100%; padding: 8px 12px; border: 2px solid #c8cedc; border-radius: 6px; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.15s; }
+    .client-name-wrap input[type="text"]:focus { border-color: #482A7A; }
+    .client-name-wrap input[type="text"].input-error { border-color: #c0392b; background: #fdecea; }
+    .required-star { color: #B31F7E; font-weight: 800; margin-right: 2px; }
+    .client-name-error { font-size: 0.78rem; color: #c0392b; font-weight: 600; margin-top: 4px; display: none; }
+    .client-name-error.visible { display: block; }
+    .client-name-field { flex: 1; min-width: 220px; }
+
+    /* Dimension toggle */
+    .dim-toggle { appearance: none; -webkit-appearance: none; width: 32px; height: 17px; background: #c8cedc; border-radius: 9px; cursor: pointer; position: relative; flex-shrink: 0; transition: background 0.2s; }
+    .dim-toggle:checked { background: #482A7A; }
+    .dim-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 13px; height: 13px; border-radius: 50%; background: #fff; transition: left 0.18s; }
+    .dim-toggle:checked::after { left: 17px; }
+    .dim-item.dim-disabled { opacity: 0.45; text-decoration: line-through; }
+    .dim-item.dim-disabled .dim-badge { background: #c8cedc !important; }
+
+    /* Question management */
+    .question-del-btn { background: #fdecea; border: 1px solid #f5c6cb; color: #c0392b; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 0.9rem; font-weight: 700; line-height: 1; padding: 0; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 6px; transition: background 0.15s, color 0.15s; }
+    .question-del-btn:hover { background: #c0392b; color: #fff; border-color: #c0392b; }
+    .add-question-form { background: #F7F5F9; border: 1px dashed #c4b5e0; border-radius: 8px; padding: 14px 16px; margin-top: 18px; }
+    .add-question-form .aqf-label { font-size: 0.82rem; font-weight: 700; color: #482A7A; display: block; margin-bottom: 7px; }
+    .add-question-form textarea { width: 100%; padding: 7px 10px; border: 1px solid #c8cedc; border-radius: 6px; font-size: 0.84rem; font-family: inherit; min-height: 54px; resize: vertical; outline: none; margin-bottom: 8px; }
+    .add-question-form textarea:focus { border-color: #482A7A; }
+
+    /* Disabled dimension placeholder */
+    .dim-disabled-msg { text-align: center; padding: 55px 20px; color: #8a94a8; }
+    .dim-disabled-msg .msg-icon { font-size: 2.2rem; margin-bottom: 10px; }
+    .dim-disabled-msg strong { display: block; margin-bottom: 6px; font-size: 1rem; color: #482A7A; }
+    .dim-disabled-msg span { font-size: 0.84rem; }
+
     /* RESPONSIVE */
     @media (max-width: 900px) { .results-grid { grid-template-columns: 1fr; } .dama-sidebar { width: 190px; } }
     @media (max-width: 700px) {
@@ -284,6 +317,15 @@
   <!-- ═══════════════════════ DAMA PANEL ═══════════════════════ -->
   <div class="tab-panel active" id="panel-dama">
 
+    <!-- Mandatory Client Name -->
+    <div class="client-name-wrap" id="dama-client-wrap">
+      <label for="client-name-input"><span class="required-star">★</span> Client / Organisation Name:</label>
+      <div class="client-name-field">
+        <input type="text" id="client-name-input" placeholder="Enter client or organisation name..." autocomplete="off" />
+        <div class="client-name-error" id="client-name-error">Client name is required before calculating maturity.</div>
+      </div>
+    </div>
+
     <!-- Survey Layout -->
     <div class="dama-layout" id="dama-survey-layout">
       <div class="dama-sidebar">
@@ -315,17 +357,13 @@
           </button>
         </div>
         <div id="dama-val-msg" style="color:#c0392b;font-size:0.83rem;font-weight:600;text-align:center;margin-top:7px;display:none;">
-          Please answer all 5 questions before proceeding.
+          Please answer all questions for this dimension before proceeding.
         </div>
       </div>
     </div>
 
     <!-- Results (hidden until submitted) -->
     <div id="dama-results">
-      <div class="org-input-wrap">
-        <label for="org-name-input">Organisation Name:</label>
-        <input type="text" id="org-name-input" placeholder="Enter organisation name..." />
-      </div>
       <div class="overall-score-card">
         <div>
           <div class="overall-score-num" id="dama-overall-num">—</div>
@@ -509,6 +547,14 @@
               </div>
             </div>
             <button class="btn btn-primary btn-sm" onclick="addValidationRule('numeric-range')">Add Numeric Range Rule</button>
+            <hr style="border:none;border-top:1px solid #e2e6f0;margin:16px 0 12px;">
+            <div class="rule-section-title">Format Validation</div>
+            <p style="font-size:0.83rem;color:#667;margin-bottom:10px;">Validate that column values match a recognised format. Select a column first.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" onclick="addFormatCheckRule('email')">Email Format</button>
+              <button class="btn btn-outline btn-sm" onclick="addFormatCheckRule('pan')">PAN (India)</button>
+              <button class="btn btn-outline btn-sm" onclick="addFormatCheckRule('gst')">GST (India)</button>
+            </div>
           </div>
 
           <!-- Business Rules -->
@@ -747,7 +793,14 @@ const DAMA_DIMENSIONS = [
 /* ============================================================
    DAMA STATE
 ============================================================ */
+// Mutable working copy of dimensions — supports add/remove questions & enable/disable
+let dimensionConfig = DAMA_DIMENSIONS.map(dim => ({
+  ...dim,
+  enabled: true,
+  questions: [...dim.questions]
+}));
 let currentDimIdx = 0;
+let lastAssessmentData = null; // stored for PDF export
 
 /* ============================================================
    DAMA INIT — build sidebar + question panels from data
@@ -758,47 +811,153 @@ function initDAMA() {
   dimList.innerHTML = '';
   panelsContainer.innerHTML = '';
 
-  DAMA_DIMENSIONS.forEach((dim, idx) => {
-    // Sidebar item
+  dimensionConfig.forEach((dim, idx) => {
+    // Sidebar item with enable/disable toggle
     const item = document.createElement('div');
-    item.className = 'dim-item' + (idx === 0 ? ' active' : '');
+    item.className = 'dim-item' + (idx === 0 ? ' active' : '') + (!dim.enabled ? ' dim-disabled' : '');
     item.dataset.idx = idx;
-    item.onclick = () => switchDimension(idx);
-    item.innerHTML = `<span class="dim-badge" style="background:${dim.color}"></span>${dim.label}`;
+
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.className = 'dim-toggle';
+    toggle.checked = dim.enabled;
+    toggle.title = 'Enable / disable this dimension';
+    toggle.onclick = (e) => { e.stopPropagation(); toggleDimension(idx, toggle.checked); };
+
+    const badge = document.createElement('span');
+    badge.className = 'dim-badge';
+    badge.style.background = dim.color;
+
+    const labelSpan = document.createElement('span');
+    labelSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;';
+    labelSpan.textContent = dim.label;
+
+    item.appendChild(toggle);
+    item.appendChild(badge);
+    item.appendChild(labelSpan);
+    item.onclick = (e) => { if (e.target !== toggle) switchDimension(idx); };
     dimList.appendChild(item);
 
-    // Question panel
+    // Placeholder panel — will be filled by refreshDimPanel
     const panel = document.createElement('div');
     panel.className = 'dim-panel' + (idx === 0 ? ' active' : '');
     panel.id = 'dim-panel-' + idx;
-    let html = '';
-    dim.questions.forEach((q, qi) => {
-      const prefix = dim.id;
-      html += `
-        <div class="question-block">
-          <div class="question-label">
-            <span class="question-number">${qi + 1}</span>
-            <span>${q}</span>
-          </div>
-          <div class="options-row">
-            <input type="radio" name="${prefix}_q${qi}" id="${prefix}_q${qi}_1" value="1">
-            <label for="${prefix}_q${qi}_1">1 — Not at all</label>
-            <input type="radio" name="${prefix}_q${qi}" id="${prefix}_q${qi}_2" value="2">
-            <label for="${prefix}_q${qi}_2">2 — Ad-hoc</label>
-            <input type="radio" name="${prefix}_q${qi}" id="${prefix}_q${qi}_3" value="3">
-            <label for="${prefix}_q${qi}_3">3 — Partial</label>
-            <input type="radio" name="${prefix}_q${qi}" id="${prefix}_q${qi}_4" value="4">
-            <label for="${prefix}_q${qi}_4">4 — Largely</label>
-            <input type="radio" name="${prefix}_q${qi}" id="${prefix}_q${qi}_5" value="5">
-            <label for="${prefix}_q${qi}_5">5 — Full</label>
-          </div>
-        </div>`;
-    });
-    panel.innerHTML = html;
     panelsContainer.appendChild(panel);
+
+    refreshDimPanel(idx, null);
   });
 
   updateDAMANav();
+}
+
+/* ── Capture radio answers for a dimension (before re-render) ── */
+function captureAnswers(idx) {
+  const dim = dimensionConfig[idx];
+  const saved = {};
+  dim.questions.forEach((_, qi) => {
+    const sel = document.querySelector(`input[name="${dim.id}_q${qi}"]:checked`);
+    if (sel) saved[qi] = parseInt(sel.value, 10);
+  });
+  return saved;
+}
+
+/* ── Re-render a dimension's question panel ── */
+function refreshDimPanel(idx, savedAnswers) {
+  const panel = document.getElementById('dim-panel-' + idx);
+  if (!panel) return;
+  const dim = dimensionConfig[idx];
+
+  if (!dim.enabled) {
+    panel.innerHTML = `
+      <div class="dim-disabled-msg">
+        <div class="msg-icon">⏸</div>
+        <strong>${escHtml(dim.label)} — Disabled</strong>
+        <span>Enable this dimension using the toggle in the sidebar to include it in the assessment.</span>
+      </div>`;
+    updateDAMANav();
+    return;
+  }
+
+  let html = '';
+  dim.questions.forEach((q, qi) => {
+    html += `
+      <div class="question-block">
+        <div class="question-label">
+          <span class="question-number">${qi + 1}</span>
+          <span style="flex:1">${escHtml(q)}</span>
+          <button class="question-del-btn" onclick="removeQuestion(${idx},${qi})" title="Remove this question">×</button>
+        </div>
+        <div class="options-row">
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_1" value="1">
+          <label for="${dim.id}_q${qi}_1">1 — Not at all</label>
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_2" value="2">
+          <label for="${dim.id}_q${qi}_2">2 — Ad-hoc</label>
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_3" value="3">
+          <label for="${dim.id}_q${qi}_3">3 — Partial</label>
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_4" value="4">
+          <label for="${dim.id}_q${qi}_4">4 — Largely</label>
+          <input type="radio" name="${dim.id}_q${qi}" id="${dim.id}_q${qi}_5" value="5">
+          <label for="${dim.id}_q${qi}_5">5 — Full</label>
+        </div>
+      </div>`;
+  });
+
+  html += `
+    <div class="add-question-form">
+      <span class="aqf-label">Add a custom question to this dimension:</span>
+      <textarea id="add-q-text-${idx}" placeholder="Enter your question text..."></textarea>
+      <button class="btn btn-outline btn-sm" onclick="addQuestion(${idx})">+ Add Question</button>
+    </div>`;
+
+  panel.innerHTML = html;
+
+  // Restore radio selections
+  if (savedAnswers) {
+    Object.entries(savedAnswers).forEach(([qi, val]) => {
+      const radio = document.getElementById(`${dim.id}_q${parseInt(qi, 10)}_${val}`);
+      if (radio) radio.checked = true;
+    });
+  }
+  updateDAMANav();
+}
+
+/* ── Toggle dimension on/off ── */
+function toggleDimension(idx, checked) {
+  const savedAnswers = captureAnswers(idx);
+  dimensionConfig[idx].enabled = checked;
+  const sidebarItems = document.querySelectorAll('.dim-item');
+  if (sidebarItems[idx]) sidebarItems[idx].classList.toggle('dim-disabled', !checked);
+  refreshDimPanel(idx, savedAnswers);
+}
+
+/* ── Add a custom question to a dimension ── */
+function addQuestion(idx) {
+  const textarea = document.getElementById(`add-q-text-${idx}`);
+  if (!textarea) return;
+  const text = textarea.value.trim();
+  if (!text) { alert('Please enter a question text.'); textarea.focus(); return; }
+  const savedAnswers = captureAnswers(idx);
+  dimensionConfig[idx].questions.push(text);
+  textarea.value = '';
+  refreshDimPanel(idx, savedAnswers);
+}
+
+/* ── Remove a question from a dimension ── */
+function removeQuestion(idx, qi) {
+  if (dimensionConfig[idx].questions.length <= 1) {
+    alert('Each dimension must have at least one question.'); return;
+  }
+  if (!confirm('Remove this question? Any answer for it will be cleared.')) return;
+  const savedAnswers = captureAnswers(idx);
+  dimensionConfig[idx].questions.splice(qi, 1);
+  // Remap answers: shift indices down past the removed question
+  const remapped = {};
+  Object.entries(savedAnswers).forEach(([k, v]) => {
+    const n = parseInt(k, 10);
+    if (n < qi) remapped[n] = v;
+    else if (n > qi) remapped[n - 1] = v;
+  });
+  refreshDimPanel(idx, remapped);
 }
 
 function switchDimension(idx) {
@@ -807,13 +966,14 @@ function switchDimension(idx) {
   currentDimIdx = idx;
   document.getElementById('dim-panel-' + idx).classList.add('active');
   document.querySelectorAll('.dim-item')[idx].classList.add('active');
-  document.getElementById('dim-title').textContent = DAMA_DIMENSIONS[idx].label;
+  document.getElementById('dim-title').textContent = dimensionConfig[idx].label;
   document.getElementById('dama-val-msg').style.display = 'none';
   updateDAMANav();
 }
 
 function getDimScore(idx) {
-  const dim = DAMA_DIMENSIONS[idx];
+  const dim = dimensionConfig[idx];
+  if (!dim.enabled) return null;
   const vals = dim.questions.map((_, qi) => {
     const sel = document.querySelector(`input[name="${dim.id}_q${qi}"]:checked`);
     return sel ? parseInt(sel.value, 10) : null;
@@ -823,19 +983,20 @@ function getDimScore(idx) {
 }
 
 function isDimComplete(idx) {
+  if (!dimensionConfig[idx].enabled) return true; // disabled dims are skipped, not "incomplete"
   return getDimScore(idx) !== null;
 }
 
 function updateDAMANav() {
-  const isLast = currentDimIdx === DAMA_DIMENSIONS.length - 1;
+  const isLast = currentDimIdx === dimensionConfig.length - 1;
   document.getElementById('dim-progress').textContent =
-    `Dimension ${currentDimIdx + 1} of ${DAMA_DIMENSIONS.length}`;
+    `Dimension ${currentDimIdx + 1} of ${dimensionConfig.length}`;
   document.getElementById('dama-next-btn').style.display = isLast ? 'none' : '';
   document.getElementById('dama-submit-btn').style.display = isLast ? 'flex' : 'none';
-  // Update completion ticks in sidebar
-  DAMA_DIMENSIONS.forEach((_, idx) => {
+  // Update completion ticks in sidebar (only for enabled, completed dims)
+  dimensionConfig.forEach((d, idx) => {
     const item = document.querySelectorAll('.dim-item')[idx];
-    if (item) item.classList.toggle('completed', isDimComplete(idx));
+    if (item) item.classList.toggle('completed', d.enabled && isDimComplete(idx));
   });
 }
 
@@ -844,53 +1005,78 @@ function prevDimension() {
 }
 
 function nextDimension() {
-  if (!isDimComplete(currentDimIdx)) {
+  if (dimensionConfig[currentDimIdx].enabled && !isDimComplete(currentDimIdx)) {
     document.getElementById('dama-val-msg').style.display = 'block';
     return;
   }
   document.getElementById('dama-val-msg').style.display = 'none';
-  if (currentDimIdx < DAMA_DIMENSIONS.length - 1) switchDimension(currentDimIdx + 1);
+  if (currentDimIdx < dimensionConfig.length - 1) switchDimension(currentDimIdx + 1);
 }
 
 /* ============================================================
    DAMA SUBMIT
 ============================================================ */
 function submitDAMA() {
-  // Validate all dimensions
-  const firstMissing = DAMA_DIMENSIONS.findIndex((_, i) => !isDimComplete(i));
+  // 1. Validate mandatory client name
+  const clientNameInput = document.getElementById('client-name-input');
+  const clientName = clientNameInput ? clientNameInput.value.trim() : '';
+  const clientNameError = document.getElementById('client-name-error');
+  if (!clientName) {
+    clientNameInput.classList.add('input-error');
+    clientNameError.classList.add('visible');
+    clientNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    clientNameInput.focus();
+    return;
+  }
+  clientNameInput.classList.remove('input-error');
+  clientNameError.classList.remove('visible');
+
+  // 2. Ensure at least one dimension is enabled
+  const enabledIndices = dimensionConfig.map((d, i) => d.enabled ? i : -1).filter(i => i !== -1);
+  if (enabledIndices.length === 0) {
+    alert('Please enable at least one dimension before calculating maturity.');
+    return;
+  }
+
+  // 3. Validate all enabled dimensions are complete
+  const firstMissing = dimensionConfig.findIndex((d, i) => d.enabled && !isDimComplete(i));
   if (firstMissing !== -1) {
-    const missing = DAMA_DIMENSIONS.filter((_, i) => !isDimComplete(i)).map(d => d.label);
-    alert(`Please complete all dimensions before calculating maturity.\n\nIncomplete: ${missing.join(', ')}`);
+    const missing = dimensionConfig.filter((d, i) => d.enabled && !isDimComplete(i)).map(d => d.label);
+    alert(`Please complete all enabled dimensions before calculating maturity.\n\nIncomplete: ${missing.join(', ')}`);
     switchDimension(firstMissing);
     return;
   }
 
-  const scores = DAMA_DIMENSIONS.map((_, idx) => getDimScore(idx));
+  // 4. Calculate scores for enabled dimensions only
+  const scores = enabledIndices.map(i => getDimScore(i));
   const overallScore = scores.reduce((a, b) => a + b, 0) / scores.length;
 
-  // Show results
+  // Store for PDF export
+  lastAssessmentData = { scores, enabledIndices, clientName };
+
+  // 5. Show results, hide survey
   document.getElementById('dama-survey-layout').style.display = 'none';
+  document.getElementById('dama-client-wrap').style.display = 'none';
   const resultsEl = document.getElementById('dama-results');
   resultsEl.classList.add('visible');
 
-  // Overall card
+  // 6. Overall score card
   const overallLevel = getLevel(overallScore);
   document.getElementById('dama-overall-num').textContent = overallScore.toFixed(2);
   const badge = document.getElementById('dama-overall-badge');
   badge.textContent = overallLevel.label;
   badge.style.background = overallLevel.color;
   document.getElementById('dama-overall-rec').textContent = overallLevel.rec;
-
-  const orgName = document.getElementById('org-name-input').value.trim() || 'Your Organisation';
-  document.getElementById('dama-display-org').textContent = orgName;
+  document.getElementById('dama-display-org').textContent = clientName;
   document.getElementById('dama-display-date').textContent =
     new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  // Dimension table
+  // 7. Dimension table (enabled dims only)
   const tbody = document.getElementById('dama-dim-tbody');
   tbody.innerHTML = '';
-  scores.forEach((score, idx) => {
-    const dim = DAMA_DIMENSIONS[idx];
+  enabledIndices.forEach((dimIdx, si) => {
+    const dim = dimensionConfig[dimIdx];
+    const score = scores[si];
     const level = getLevel(score);
     const pct = ((score - 1) / 4 * 100).toFixed(1);
     const tr = document.createElement('tr');
@@ -909,11 +1095,12 @@ function submitDAMA() {
     });
   }));
 
-  // Recommendations — bottom 3 by score
-  const ranked = scores.map((s, i) => ({ score: s, dim: DAMA_DIMENSIONS[i] })).sort((a, b) => a.score - b.score);
+  // 8. Recommendations — bottom 3 enabled dims by score
+  const ranked = scores.map((s, si) => ({ score: s, dim: dimensionConfig[enabledIndices[si]] }))
+    .sort((a, b) => a.score - b.score);
   const recsEl = document.getElementById('dama-recommendations');
   recsEl.innerHTML = '';
-  ranked.slice(0, 3).forEach(r => {
+  ranked.slice(0, Math.min(3, ranked.length)).forEach(r => {
     const level = getLevel(r.score);
     const div = document.createElement('div');
     div.className = 'rec-item';
@@ -922,13 +1109,14 @@ function submitDAMA() {
     recsEl.appendChild(div);
   });
 
-  // Render radar
-  renderRadarChart(scores);
+  // 9. Render radar (enabled dims only)
+  renderRadarChart(scores, enabledIndices.map(i => dimensionConfig[i]));
   resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function retakeDAMA() {
   document.getElementById('dama-survey-layout').style.display = 'flex';
+  document.getElementById('dama-client-wrap').style.display = 'flex';
   document.getElementById('dama-results').classList.remove('visible');
   switchDimension(0);
 }
@@ -936,7 +1124,8 @@ function retakeDAMA() {
 /* ============================================================
    SVG RADAR CHART — 11 axes
 ============================================================ */
-function renderRadarChart(scores) {
+function renderRadarChart(scores, dims) {
+  dims = dims || dimensionConfig.filter(d => d.enabled);
   const svg = document.getElementById('dama-radar');
   const W = 420, H = 420, cx = 210, cy = 210, maxR = 155;
   const n = scores.length;
@@ -995,7 +1184,7 @@ function renderRadarChart(scores) {
   // Axis labels
   scores.forEach((_, idx) => {
     const outer = polar(idx, maxR + 24);
-    const label = DAMA_DIMENSIONS[idx].label;
+    const label = dims[idx] ? dims[idx].label : '';
     const words = label.split(' ');
     const t = el('text', {
       x: outer.x, y: outer.y,
@@ -1029,98 +1218,281 @@ async function exportDamaPDF() {
   btn.disabled = true;
 
   try {
-    if (!window.jspdf) throw new Error('jsPDF library not loaded. Check your internet connection.');
+    if (!window.jspdf) throw new Error('jsPDF library not loaded. Please check your internet connection.');
+    if (!lastAssessmentData) throw new Error('No assessment data found. Please run the assessment first.');
+
     const { jsPDF } = window.jspdf;
+    const { scores, enabledIndices, clientName } = lastAssessmentData;
+    const enabledDims = enabledIndices.map(i => dimensionConfig[i]);
+    const n = scores.length;
+    const overallScore = scores.reduce((a, b) => a + b, 0) / n;
+    const overallLevel = getLevel(overallScore);
+    const dateStr = document.getElementById('dama-display-date').textContent;
+
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const W = 297, H = 210;
 
-    // Header bar — Uniqus brand gradient (purple → magenta)
-    doc.setFillColor(72, 42, 122);
-    doc.rect(0, 0, W, 24, 'F');
-    doc.setFillColor(179, 31, 126);
-    doc.rect(W * 0.55, 0, W * 0.45, 24, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(13);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Uniqus Consultech — DAMA Maturity Assessment', 14, 15);
-    const orgName = document.getElementById('org-name-input').value.trim() || 'Your Organisation';
-    const dateStr = document.getElementById('dama-display-date').textContent;
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`${orgName}  |  ${dateStr}`, W - 14, 15, { align: 'right' });
+    // ── Utility: hex colour → [r,g,b] ─────────────────────────────
+    function hexRgb(hex) {
+      hex = (hex || '#888888').replace('#', '');
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+    }
 
-    // Overall score
-    const overallNum = document.getElementById('dama-overall-num').textContent;
-    const overallBadge = document.getElementById('dama-overall-badge').textContent;
-    doc.setTextColor(26, 43, 74);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Overall Maturity Score: ${overallNum} / 5.00  —  ${overallBadge}`, 14, 30);
-
-    // Radar chart via html2canvas
-    const radarEl = document.getElementById('dama-radar');
-    const canvas = await html2canvas(radarEl, { scale: 2, backgroundColor: '#ffffff', logging: false });
-    const imgData = canvas.toDataURL('image/png');
-    doc.addImage(imgData, 'PNG', 10, 36, 95, 95);
-
-    // Dimension table
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(26, 43, 74);
-    doc.text('Dimension Scores', 115, 36);
-
-    let y = 42;
-    doc.setFillColor(237, 229, 245);
-    doc.rect(115, y - 4, 175, 7, 'F');
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Knowledge Area', 117, y);
-    doc.text('Score', 210, y);
-    doc.text('Level', 230, y);
-    y += 6;
-
-    doc.setFont('helvetica', 'normal');
-    document.querySelectorAll('#dama-dim-tbody tr').forEach(row => {
-      const cells = row.querySelectorAll('td');
-      const name = cells[0].textContent.trim();
-      const score = cells[1].textContent.trim();
-      const level = cells[2].textContent.trim();
-      doc.setTextColor(50, 50, 50);
-      doc.text(name.substring(0, 40), 117, y);
-      doc.text(score, 210, y);
-      doc.text(level, 230, y);
-      y += 6;
-      if (y > 195) { doc.addPage(); y = 20; }
-    });
-
-    // Recommendations
-    y = Math.max(y + 4, 140);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(26, 43, 74);
-    doc.text('Top Priority Recommendations', 14, y);
-    y += 6;
-
-    document.querySelectorAll('#dama-recommendations .rec-item').forEach(item => {
-      const dimTitle = item.querySelector('.rec-dim').textContent;
-      const recText = item.textContent.replace(dimTitle, '').trim();
+    // ── Header bar (drawn on every page) ──────────────────────────
+    function drawHeader(subtitle) {
+      doc.setFillColor(72, 42, 122);
+      doc.rect(0, 0, W, 18, 'F');
+      doc.setFillColor(179, 31, 126);
+      doc.rect(W * 0.6, 0, W * 0.4, 18, 'F');
+      doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.setTextColor(26, 43, 74);
-      if (y > 195) { doc.addPage(); y = 20; }
-      doc.text(dimTitle, 14, y); y += 5;
+      doc.setFontSize(10.5);
+      doc.text('Uniqus Consultech — DAMA Maturity Assessment', 12, 11.5);
+      doc.setFontSize(7.5);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(70, 70, 70);
-      const lines = doc.splitTextToSize(recText, 265);
-      lines.slice(0, 3).forEach(line => {
-        if (y > 195) { doc.addPage(); y = 20; }
-        doc.text(line, 14, y); y += 5;
+      doc.text(`${clientName}  |  ${dateStr}`, W - 12, 11.5, { align: 'right' });
+      // Subtitle
+      doc.setTextColor(72, 42, 122);
+      doc.setFontSize(9.5);
+      doc.setFont('helvetica', 'bold');
+      doc.text(subtitle, 12, 27);
+    }
+
+    // ── Draw radar chart using jsPDF native drawing ────────────────
+    function drawRadarChart(cx, cy, maxR) {
+      if (n === 0) return;
+      function polar(idx, r) {
+        const angle = (idx / n) * 2 * Math.PI - Math.PI / 2;
+        return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+      }
+
+      // Background rings
+      [1, 2, 3, 4, 5].forEach(lvl => {
+        const r = (lvl - 1) / 4 * maxR;
+        if (r < 0.5) return;
+        const ring = Array.from({ length: n }, (_, i) => polar(i, r));
+        doc.setDrawColor(220, 215, 235);
+        doc.setLineWidth(0.25);
+        if (lvl % 2 === 0) doc.setFillColor(247, 245, 251); else doc.setFillColor(255, 255, 255);
+        const rel = [];
+        for (let i = 1; i < ring.length; i++) {
+          rel.push([ring[i][0] - ring[i-1][0], ring[i][1] - ring[i-1][1]]);
+        }
+        doc.lines(rel, ring[0][0], ring[0][1], [1, 1], lvl % 2 === 0 ? 'FD' : 'S', true);
+        if (lvl > 1) {
+          const lp = polar(0, r);
+          doc.setFontSize(4); doc.setTextColor(180, 180, 190); doc.setFont('helvetica', 'normal');
+          doc.text(String(lvl), lp[0] + 0.8, lp[1] + 0.5);
+        }
       });
-      y += 3;
+
+      // Axis lines
+      doc.setDrawColor(205, 210, 225); doc.setLineWidth(0.25);
+      scores.forEach((_, idx) => {
+        const outer = polar(idx, maxR);
+        doc.line(cx, cy, outer[0], outer[1]);
+      });
+
+      // Score polygon (filled)
+      const scorePts = scores.map((s, i) => { const r = Math.max(0.5, (s - 1) / 4 * maxR); return polar(i, r); });
+      doc.setFillColor(242, 225, 248);
+      doc.setDrawColor(72, 42, 122);
+      doc.setLineWidth(0.7);
+      const relScore = [];
+      for (let i = 1; i < scorePts.length; i++) {
+        relScore.push([scorePts[i][0] - scorePts[i-1][0], scorePts[i][1] - scorePts[i-1][1]]);
+      }
+      doc.lines(relScore, scorePts[0][0], scorePts[0][1], [1, 1], 'FD', true);
+
+      // Score dots
+      scores.forEach((s, idx) => {
+        const r = Math.max(0.5, (s - 1) / 4 * maxR);
+        const p = polar(idx, r);
+        const [cr, cg, cb] = hexRgb(getLevel(s).color);
+        doc.setFillColor(cr, cg, cb);
+        doc.setDrawColor(255, 255, 255);
+        doc.setLineWidth(0.5);
+        doc.circle(p[0], p[1], 1.6, 'FD');
+      });
+
+      // Axis labels
+      enabledDims.forEach((dim, idx) => {
+        const outer = polar(idx, maxR + 9);
+        doc.setFontSize(5); doc.setFont('helvetica', 'bold'); doc.setTextColor(72, 42, 122);
+        const words = dim.label.split(' ');
+        if (words.length <= 2) {
+          doc.text(dim.label, outer[0], outer[1], { align: 'center', baseline: 'middle' });
+        } else {
+          const mid = Math.ceil(words.length / 2);
+          doc.text(words.slice(0, mid).join(' '), outer[0], outer[1] - 1.6, { align: 'center' });
+          doc.text(words.slice(mid).join(' '), outer[0], outer[1] + 1.6, { align: 'center' });
+        }
+      });
+
+      // Centre overall score
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(72, 42, 122);
+      doc.text(overallScore.toFixed(1), cx, cy - 1.5, { align: 'center' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(4.5); doc.setTextColor(138, 148, 168);
+      doc.text('OVERALL', cx, cy + 3.5, { align: 'center' });
+    }
+
+    // ══════════════════════════════════════════════════
+    // PAGE 1 — Overview (score + radar side by side)
+    // ══════════════════════════════════════════════════
+    drawHeader('Assessment Overview');
+
+    // Overall score box
+    doc.setFillColor(72, 42, 122);
+    doc.rect(12, 32, 90, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.text(overallScore.toFixed(2), 22, 49);
+    doc.setFontSize(8);
+    doc.text('/ 5.00  —  Overall Maturity', 48, 49);
+    // Level badge
+    const [lr, lg, lb] = hexRgb(overallLevel.color);
+    doc.setFillColor(lr, lg, lb);
+    doc.roundedRect(22, 53, 35, 6.5, 3, 3, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7.5);
+    doc.text(overallLevel.label, 39.5, 57.5, { align: 'center' });
+
+    // Client info below score box
+    doc.setTextColor(60, 60, 90);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+    doc.text('Client:', 12, 70);
+    doc.setFont('helvetica', 'normal');
+    doc.text(clientName, 30, 70);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Date:', 12, 76);
+    doc.setFont('helvetica', 'normal');
+    doc.text(dateStr, 30, 76);
+
+    // Recommendation text
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(7.5); doc.setTextColor(70, 70, 100);
+    const recLines = doc.splitTextToSize(overallLevel.rec, 95);
+    let ry = 84;
+    recLines.slice(0, 5).forEach(line => { doc.text(line, 12, ry); ry += 4.3; });
+
+    // Radar chart (right half of page)
+    drawRadarChart(210, 120, 63);
+
+    // ══════════════════════════════════════════════════
+    // PAGE 2 — Dimension Scores Table
+    // ══════════════════════════════════════════════════
+    doc.addPage();
+    drawHeader('Dimension Scores');
+
+    let ty = 36;
+    // Table header row
+    doc.setFillColor(237, 229, 245);
+    doc.rect(12, ty - 5, W - 24, 8, 'F');
+    doc.setTextColor(72, 42, 122);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+    doc.text('Knowledge Area', 15, ty);
+    doc.text('Score', 148, ty);
+    doc.text('Level', 170, ty);
+    doc.text('Progress', 210, ty);
+    doc.text('Status', 272, ty);
+    ty += 7;
+
+    dimensionConfig.forEach((dim, idx) => {
+      if (ty > 196) { doc.addPage(); drawHeader('Dimension Scores (cont.)'); ty = 36; }
+      if (idx % 2 === 0) { doc.setFillColor(249, 247, 252); doc.rect(12, ty - 4.5, W - 24, 8, 'F'); }
+      const enabled = dim.enabled;
+      const score = enabled ? getDimScore(idx) : null;
+      // Colour dot
+      const [dr, dg, db] = hexRgb(dim.color);
+      doc.setFillColor(enabled ? dr : 180, enabled ? dg : 180, enabled ? db : 180);
+      doc.circle(15, ty - 1.5, 1.6, 'F');
+      doc.setTextColor(enabled ? 40 : 160, enabled ? 40 : 160, enabled ? 60 : 160);
+      doc.setFont('helvetica', enabled ? 'normal' : 'italic'); doc.setFontSize(7.5);
+      doc.text(dim.label, 19, ty);
+      if (enabled && score !== null) {
+        doc.setFont('helvetica', 'bold');
+        doc.text(score.toFixed(2), 148, ty);
+        const lv = getLevel(score); const [pvr, pvg, pvb] = hexRgb(lv.color);
+        doc.setFillColor(pvr, pvg, pvb);
+        doc.roundedRect(168, ty - 4.5, 30, 6, 2, 2, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFontSize(6.5);
+        doc.text(lv.label, 183, ty - 0.5, { align: 'center' });
+        // Progress bar
+        const bw = (score - 1) / 4 * 55;
+        doc.setFillColor(225, 218, 240); doc.rect(208, ty - 3.5, 55, 4, 'F');
+        doc.setFillColor(pvr, pvg, pvb); doc.rect(208, ty - 3.5, bw, 4, 'F');
+        doc.setTextColor(39, 163, 85); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+        doc.text('Assessed', 272, ty);
+      } else {
+        doc.setTextColor(170, 170, 180); doc.setFont('helvetica', 'italic'); doc.setFontSize(7);
+        doc.text('Disabled', 148, ty);
+        doc.text('—', 272, ty);
+      }
+      ty += 8;
     });
 
-    const fileName = `DAMA_Maturity_${orgName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+    // ══════════════════════════════════════════════════
+    // PAGE 3+ — Client Responses
+    // ══════════════════════════════════════════════════
+    doc.addPage();
+    drawHeader('Client Responses');
+    ty = 34;
+
+    const answerLabels = ['', '1 — Not at all', '2 — Ad-hoc', '3 — Partial', '4 — Largely', '5 — Fully implemented'];
+
+    enabledIndices.forEach((dimIdx, si) => {
+      const dim = dimensionConfig[dimIdx];
+      const score = scores[si];
+      const level = getLevel(score);
+      const [dr, dg, db] = hexRgb(dim.color);
+
+      if (ty > 175) { doc.addPage(); drawHeader('Client Responses (cont.)'); ty = 34; }
+
+      // Dimension heading bar
+      doc.setFillColor(dr, dg, db);
+      doc.rect(12, ty - 4, W - 24, 9, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
+      doc.text(dim.label, 15, ty + 1.5);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+      doc.text(`Score: ${score.toFixed(2)} — ${level.label}`, W - 15, ty + 1.5, { align: 'right' });
+      ty += 13;
+
+      dim.questions.forEach((q, qi) => {
+        const sel = document.querySelector(`input[name="${dim.id}_q${qi}"]:checked`);
+        const answerVal = sel ? parseInt(sel.value, 10) : null;
+        const answerText = answerVal ? answerLabels[answerVal] : 'Not answered';
+
+        if (ty > 190) { doc.addPage(); drawHeader('Client Responses (cont.)'); ty = 34; }
+
+        // Question
+        doc.setTextColor(50, 50, 80); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+        const qLines = doc.splitTextToSize(`Q${qi + 1}: ${q}`, W - 55);
+        qLines.forEach(line => {
+          if (ty > 190) { doc.addPage(); drawHeader('Client Responses (cont.)'); ty = 34; }
+          doc.text(line, 16, ty); ty += 4;
+        });
+
+        // Answer
+        if (answerVal) {
+          const [ar, ag, ab] = hexRgb(getLevel(answerVal).color);
+          doc.setTextColor(ar, ag, ab);
+        } else {
+          doc.setTextColor(160, 160, 160);
+        }
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+        doc.text(`Answer: ${answerText}`, 20, ty);
+        ty += 7;
+      });
+
+      ty += 5; // gap between dimensions
+    });
+
+    const safeClient = clientName.replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 40);
+    const fileName = `DAMA_Maturity_${safeClient}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
+
   } catch (e) {
     console.error(e);
     alert('PDF export failed: ' + e.message);
@@ -1378,6 +1750,20 @@ function addBusinessRule() {
   renderRulesList();
 }
 
+function addFormatCheckRule(format) {
+  if (!selectedColumn) { alert('Select a column from the left panel first.'); return; }
+  const labels = { email: 'Email format', pan: 'PAN (India) format', gst: 'GST (India) format' };
+  configuredRules.push({
+    id: 'rule-' + (ruleIdCounter++),
+    dimension: 'Validation',
+    columns: [selectedColumn],
+    type: 'format-check',
+    format,
+    label: `Validation: ${selectedColumn} — ${labels[format] || format}`
+  });
+  renderRulesList();
+}
+
 function deleteRule(id) {
   configuredRules = configuredRules.filter(r => r.id !== id);
   renderRulesList();
@@ -1476,6 +1862,15 @@ function passesRule(row, rule) {
     case 'js-expression': {
       try { return !!(new Function('row', `return !!(${rule.expr})`)(row)); }
       catch (e) { return false; }
+    }
+    case 'format-check': {
+      const patterns = {
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        pan:   /^[A-Z]{5}[0-9]{4}[A-Z]$/,
+        gst:   /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/
+      };
+      const pattern = patterns[rule.format];
+      return pattern ? pattern.test(str) : true;
     }
     default: return true;
   }
