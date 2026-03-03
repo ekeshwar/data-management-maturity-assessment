@@ -317,6 +317,11 @@
       </div>
     </div>
     <div class="header-tool-name">Enterprise Data Management Tool</div>
+    <div id="header-user-info" style="display:flex;align-items:center;gap:10px;margin-left:auto;">
+      <span id="header-user-name" style="font-size:0.82rem;font-weight:600;color:#fff;"></span>
+      <span id="header-user-role" style="font-size:0.7rem;background:rgba(255,255,255,0.18);border-radius:12px;padding:3px 10px;color:#fff;"></span>
+      <button onclick="logout()" class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.4);">Logout</button>
+    </div>
   </div>
 </header>
 
@@ -324,6 +329,7 @@
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('dama', this)">DAMA Maturity Assessment</button>
     <button class="tab-btn" onclick="switchTab('dq', this)">Data Quality Assessment</button>
+    <button class="tab-btn" id="tab-btn-users" onclick="switchTab('users', this)" style="display:none;">User Management</button>
   </div>
 
   <!-- ═══════════════════════ DAMA PANEL ═══════════════════════ -->
@@ -639,6 +645,98 @@
       </div>
     </div>
   </div>
+
+  <!-- ═══════════════════════ USER MANAGEMENT PANEL ═══════════════════════ -->
+  <div class="tab-panel" id="panel-users" style="background:#fff;border-radius:0 0 16px 16px;box-shadow:0 4px 20px rgba(72,42,122,0.12);min-height:600px;padding:26px 30px;">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2 style="font-size:1.12rem;font-weight:700;color:#482A7A;margin-bottom:3px;">User Management</h2>
+        <p style="font-size:0.82rem;color:#667;">Invite users, manage roles and client/master access.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openInviteModal()">+ Invite User</button>
+    </div>
+
+    <!-- Alert -->
+    <div id="users-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.84rem;font-weight:600;margin-bottom:16px;"></div>
+
+    <!-- Users Table -->
+    <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:10px;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.83rem;" id="users-table">
+        <thead>
+          <tr style="background:linear-gradient(90deg,#482A7A,#B31F7E);">
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Name</th>
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Email</th>
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Role</th>
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Status</th>
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody">
+          <tr><td colspan="5" style="padding:40px;text-align:center;color:#8a94a8;">Loading users…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Access sub-panel (appears below table when expanded) -->
+    <div id="access-panel" style="display:none;margin-top:22px;background:#F7F5F9;border:1px solid #e2e6f0;border-radius:10px;padding:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <h3 id="access-panel-title" style="font-size:0.95rem;font-weight:700;color:#482A7A;"></h3>
+        <button class="btn btn-outline btn-sm" onclick="closeAccessPanel()">Close</button>
+      </div>
+      <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:8px;background:#fff;margin-bottom:14px;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;" id="access-table">
+          <thead>
+            <tr style="background:#EDE5F5;">
+              <th style="padding:8px 12px;text-align:left;color:#482A7A;font-weight:700;">Client Name</th>
+              <th style="padding:8px 12px;text-align:left;color:#482A7A;font-weight:700;">Master Name</th>
+              <th style="padding:8px 12px;text-align:left;color:#482A7A;font-weight:700;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="access-tbody"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div>
+          <label style="font-size:0.8rem;font-weight:600;color:#482A7A;display:block;margin-bottom:4px;">Client Name</label>
+          <input type="text" id="access-client" placeholder="e.g. Acme Corp" style="padding:7px 10px;border:1.5px solid #c8cedc;border-radius:6px;font-size:0.86rem;font-family:inherit;outline:none;width:180px;" />
+        </div>
+        <div>
+          <label style="font-size:0.8rem;font-weight:600;color:#482A7A;display:block;margin-bottom:4px;">Master Name (optional)</label>
+          <input type="text" id="access-master" placeholder="* = all masters" style="padding:7px 10px;border:1.5px solid #c8cedc;border-radius:6px;font-size:0.86rem;font-family:inherit;outline:none;width:180px;" />
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="grantAccess()">Grant Access</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Invite User Modal ─── -->
+<div id="invite-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,0.22);padding:36px 40px;width:100%;max-width:420px;margin:20px;">
+    <h3 style="font-size:1.05rem;font-weight:700;color:#482A7A;margin-bottom:18px;">Invite New User</h3>
+    <div id="invite-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.84rem;font-weight:600;margin-bottom:14px;background:#fdecea;color:#c0392b;border:1px solid #f5c6cb;"></div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;color:#482A7A;margin-bottom:5px;">Email address</label>
+      <input type="email" id="invite-email" placeholder="user@company.com" style="width:100%;padding:9px 12px;border:1.5px solid #c8cedc;border-radius:7px;font-size:0.88rem;font-family:inherit;outline:none;" />
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;color:#482A7A;margin-bottom:5px;">Full name</label>
+      <input type="text" id="invite-name" placeholder="User's full name" style="width:100%;padding:9px 12px;border:1.5px solid #c8cedc;border-radius:7px;font-size:0.88rem;font-family:inherit;outline:none;" />
+    </div>
+    <div style="margin-bottom:22px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;color:#482A7A;margin-bottom:5px;">Role</label>
+      <select id="invite-role" style="width:100%;padding:9px 12px;border:1.5px solid #c8cedc;border-radius:7px;font-size:0.88rem;font-family:inherit;outline:none;background:#fff;">
+        <option value="maker">Maker</option>
+        <option value="checker">Checker</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeInviteModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1;" id="invite-submit-btn" onclick="doInviteUser()">Send Invite</button>
+    </div>
+  </div>
 </div>
 
 <footer class="site-footer">
@@ -654,6 +752,248 @@
 'use strict';
 
 /* ============================================================
+   AUTH GUARD
+============================================================ */
+(function() {
+  const token = localStorage.getItem('edm_token');
+  if (!token) { window.location.href = 'login.html'; return; }
+  fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } })
+    .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+    .then(({ user }) => {
+      window.EDM_USER = user;
+      document.getElementById('header-user-name').textContent = user.name;
+      document.getElementById('header-user-role').textContent = user.role.toUpperCase();
+      if (user.role === 'admin') {
+        document.getElementById('tab-btn-users').style.display = '';
+      }
+    })
+    .catch(() => { localStorage.clear(); window.location.href = 'login.html'; });
+})();
+
+/* ============================================================
+   AUTH: LOGOUT
+============================================================ */
+function logout() {
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
+
+/* ============================================================
+   USER MANAGEMENT
+============================================================ */
+let _currentAccessUserId = null;
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + localStorage.getItem('edm_token') };
+}
+
+function showUsersAlert(msg, isError) {
+  const el = document.getElementById('users-alert');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = isError ? '#fdecea' : '#E8F8EB';
+  el.style.color = isError ? '#c0392b' : '#1e7a3a';
+  el.style.border = '1px solid ' + (isError ? '#f5c6cb' : '#a3d9a5');
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+async function loadUsers() {
+  try {
+    const res = await fetch('/api/users', { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    const { users } = await res.json();
+    renderUsersTable(users);
+  } catch {
+    document.getElementById('users-tbody').innerHTML =
+      '<tr><td colspan="5" style="padding:30px;text-align:center;color:#e74c3c;">Failed to load users.</td></tr>';
+  }
+}
+
+function renderUsersTable(users) {
+  const tbody = document.getElementById('users-tbody');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:30px;text-align:center;color:#8a94a8;">No users found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map(u => {
+    const statusBadge = u.is_active
+      ? '<span style="display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.74rem;font-weight:700;background:#E8F8EB;color:#1e7a3a;">Active</span>'
+      : '<span style="display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.74rem;font-weight:700;background:#fdecea;color:#c0392b;">Inactive</span>';
+    const roleBadge = `<span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:0.74rem;font-weight:700;background:#EDE5F5;color:#482A7A;">${u.role}</span>`;
+    const isSelf = window.EDM_USER && u.id === window.EDM_USER.id;
+    return `<tr style="${u.id % 2 === 0 ? 'background:#F7F5F9;' : ''}">
+      <td style="padding:9px 13px;font-weight:600;">${escHtml(u.name)}</td>
+      <td style="padding:9px 13px;">${escHtml(u.email)}</td>
+      <td style="padding:9px 13px;">
+        <select onchange="changeRole(${u.id}, this.value)" style="border:1px solid #c8cedc;border-radius:6px;padding:4px 8px;font-size:0.8rem;font-family:inherit;${isSelf ? 'opacity:0.5;pointer-events:none;' : ''}">
+          <option value="maker" ${u.role==='maker'?'selected':''}>Maker</option>
+          <option value="checker" ${u.role==='checker'?'selected':''}>Checker</option>
+          <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+        </select>
+      </td>
+      <td style="padding:9px 13px;">${statusBadge}</td>
+      <td style="padding:9px 13px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="toggleActive(${u.id}, ${!u.is_active})"${isSelf?' disabled title="Cannot deactivate yourself"':''}>${u.is_active ? 'Deactivate' : 'Activate'}</button>
+          <button class="btn btn-outline btn-sm" onclick="openAccessPanel(${u.id}, '${escHtml(u.name)}')">Access</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function changeRole(userId, role) {
+  try {
+    const res = await fetch('/api/users/' + userId + '/role', {
+      method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ role }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    showUsersAlert('Role updated.', false);
+    loadUsers();
+  } catch (e) {
+    showUsersAlert(e.message || 'Failed to update role.', true);
+    loadUsers();
+  }
+}
+
+async function toggleActive(userId, activate) {
+  try {
+    const res = await fetch('/api/users/' + userId + '/active', {
+      method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ is_active: activate }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    showUsersAlert(activate ? 'User activated.' : 'User deactivated.', false);
+    loadUsers();
+  } catch (e) {
+    showUsersAlert(e.message || 'Failed to update status.', true);
+  }
+}
+
+/* Invite modal */
+function openInviteModal() {
+  document.getElementById('invite-email').value = '';
+  document.getElementById('invite-name').value = '';
+  document.getElementById('invite-role').value = 'maker';
+  document.getElementById('invite-alert').style.display = 'none';
+  document.getElementById('invite-modal').style.display = 'flex';
+}
+function closeInviteModal() {
+  document.getElementById('invite-modal').style.display = 'none';
+}
+
+async function doInviteUser() {
+  const email = document.getElementById('invite-email').value.trim();
+  const name = document.getElementById('invite-name').value.trim();
+  const role = document.getElementById('invite-role').value;
+
+  const alertEl = document.getElementById('invite-alert');
+  alertEl.style.display = 'none';
+
+  if (!email || !name) {
+    alertEl.textContent = 'Email and name are required.';
+    alertEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('invite-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const res = await fetch('/api/users/invite', {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify({ email, name, role }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alertEl.textContent = data.error || 'Invite failed.';
+      alertEl.style.display = 'block';
+    } else {
+      closeInviteModal();
+      showUsersAlert('Invitation sent to ' + email, false);
+      loadUsers();
+    }
+  } catch {
+    alertEl.textContent = 'Network error — please try again.';
+    alertEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send Invite';
+  }
+}
+
+/* Access panel */
+async function openAccessPanel(userId, userName) {
+  _currentAccessUserId = userId;
+  document.getElementById('access-panel-title').textContent = 'Client / Master Access — ' + userName;
+  document.getElementById('access-client').value = '';
+  document.getElementById('access-master').value = '';
+  document.getElementById('access-panel').style.display = 'block';
+  await refreshAccessTable();
+}
+
+function closeAccessPanel() {
+  document.getElementById('access-panel').style.display = 'none';
+  _currentAccessUserId = null;
+}
+
+async function refreshAccessTable() {
+  const tbody = document.getElementById('access-tbody');
+  tbody.innerHTML = '<tr><td colspan="3" style="padding:14px;text-align:center;color:#8a94a8;">Loading…</td></tr>';
+  try {
+    const res = await fetch('/api/users/' + _currentAccessUserId + '/access', { headers: authHeaders() });
+    const { access } = await res.json();
+    if (!access.length) {
+      tbody.innerHTML = '<tr><td colspan="3" style="padding:14px;text-align:center;color:#8a94a8;">No access records yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = access.map(a =>
+      `<tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #eaecf2;">${escHtml(a.client_name)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #eaecf2;">${escHtml(a.master_name)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #eaecf2;">
+          <button class="btn btn-outline btn-sm" style="color:#e74c3c;border-color:#e74c3c;" onclick="revokeAccess(${a.id})">Revoke</button>
+        </td>
+      </tr>`
+    ).join('');
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="3" style="padding:14px;text-align:center;color:#e74c3c;">Failed to load access.</td></tr>';
+  }
+}
+
+async function grantAccess() {
+  const client = document.getElementById('access-client').value.trim();
+  const master = document.getElementById('access-master').value.trim() || '*';
+  if (!client) { alert('Client name is required.'); return; }
+  try {
+    const res = await fetch('/api/users/' + _currentAccessUserId + '/access', {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify({ client_name: client, master_name: master }),
+    });
+    if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+    document.getElementById('access-client').value = '';
+    document.getElementById('access-master').value = '';
+    await refreshAccessTable();
+  } catch (e) {
+    alert(e.message || 'Failed to grant access.');
+  }
+}
+
+async function revokeAccess(accessId) {
+  if (!confirm('Revoke this access record?')) return;
+  try {
+    await fetch('/api/users/' + _currentAccessUserId + '/access/' + accessId, {
+      method: 'DELETE', headers: authHeaders(),
+    });
+    await refreshAccessTable();
+  } catch {
+    alert('Failed to revoke access.');
+  }
+}
+
+/* ============================================================
    SHARED: TAB SWITCHING
 ============================================================ */
 function switchTab(tabId, btn) {
@@ -661,6 +1001,7 @@ function switchTab(tabId, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + tabId).classList.add('active');
   btn.classList.add('active');
+  if (tabId === 'users') loadUsers();
 }
 
 /* ============================================================
