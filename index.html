@@ -622,8 +622,9 @@
       </div>
       <div class="step4-nav">
         <button class="btn btn-outline" onclick="goToStep(2)">← Reconfigure Rules</button>
-        <div style="display:flex;gap:10px;">
-          <button class="btn btn-primary" onclick="downloadExcel()">Download Excel Report</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="downloadExcel()">&#11015; Download Excel Report</button>
+          <button class="btn btn-success" onclick="exportDQPDF()" id="dq-pdf-btn">&#11015; Export PDF Report</button>
           <button class="btn btn-outline" onclick="resetDQ()">New Assessment</button>
         </div>
       </div>
@@ -1974,6 +1975,270 @@ function downloadExcel() {
 
   const baseName = currentFileName.split('.').slice(0, -1).join('.') || 'data';
   XLSX.writeFile(wb, `DQ_Assessment_${baseName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
+/* ============================================================
+   DQ: PDF EXPORT
+============================================================ */
+async function exportDQPDF() {
+  const btn = document.getElementById('dq-pdf-btn');
+  const origText = btn.textContent;
+  btn.textContent = 'Generating PDF...';
+  btn.disabled = true;
+
+  try {
+    if (!window.jspdf) throw new Error('jsPDF library not loaded. Please check your internet connection.');
+    if (!assessmentResults.length) throw new Error('No assessment data found. Please run the assessment first.');
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const W = 210;
+
+    const baseName = currentFileName.split('.').slice(0, -1).join('.') || 'data';
+    const dateStr = new Date().toISOString().split('T')[0];
+    const totalRules    = assessmentResults.length;
+    const passedRules   = assessmentResults.filter(r => r.exceptions.length === 0).length;
+    const failedRules   = totalRules - passedRules;
+    const totalExceptions = assessmentResults.reduce((a, r) => a + r.exceptions.length, 0);
+
+    // ── Utility: hex colour → [r,g,b] ──────────────────────────
+    function hexRgb(hex) {
+      hex = (hex || '#888888').replace('#', '');
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+    }
+
+    // ── Header bar (drawn on every page) ───────────────────────
+    function drawHeader() {
+      doc.setFillColor(72, 42, 122);
+      doc.rect(0, 0, W, 20, 'F');
+      doc.setFillColor(179, 31, 126);
+      doc.rect(W * 0.6, 0, W * 0.4, 20, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.text('Uniqus Consultech \u2014 Data Quality Assessment Report', 10, 13);
+      doc.setFontSize(6);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${baseName}  |  ${dateStr}  |  ${parsedData.length.toLocaleString()} records`, W - 10, 13, { align: 'right' });
+    }
+
+    // ── Donut chart ─────────────────────────────────────────────
+    function drawDonutChart(cx, cy, outerR, innerR) {
+      const STEPS = 60;
+
+      function drawSector(startAngle, endAngle, r, g, b) {
+        const nSteps = Math.max(2, Math.round(Math.abs(endAngle - startAngle) / (2 * Math.PI) * STEPS));
+        const pts = [[cx, cy]];
+        for (let i = 0; i <= nSteps; i++) {
+          const angle = startAngle + (endAngle - startAngle) * i / nSteps;
+          pts.push([cx + outerR * Math.cos(angle), cy + outerR * Math.sin(angle)]);
+        }
+        pts.push([cx, cy]);
+        doc.setFillColor(r, g, b);
+        doc.setDrawColor(255, 255, 255);
+        doc.setLineWidth(0.3);
+        const rel = [];
+        for (let i = 1; i < pts.length; i++) {
+          rel.push([pts[i][0] - pts[i-1][0], pts[i][1] - pts[i-1][1]]);
+        }
+        doc.lines(rel, pts[0][0], pts[0][1], [1, 1], 'FD', true);
+      }
+
+      if (failedRules === 0) {
+        doc.setFillColor(...hexRgb('#27ae60'));
+        doc.circle(cx, cy, outerR, 'F');
+      } else if (passedRules === 0) {
+        doc.setFillColor(...hexRgb('#e74c3c'));
+        doc.circle(cx, cy, outerR, 'F');
+      } else {
+        const passAngle = (passedRules / totalRules) * 2 * Math.PI;
+        const startA = -Math.PI / 2;
+        drawSector(startA, startA + passAngle, ...hexRgb('#27ae60'));
+        drawSector(startA + passAngle, startA + 2 * Math.PI, ...hexRgb('#e74c3c'));
+      }
+
+      // White donut hole
+      doc.setFillColor(255, 255, 255);
+      doc.circle(cx, cy, innerR, 'F');
+
+      // Center text
+      const pct = totalRules > 0 ? Math.round(passedRules / totalRules * 100) : 100;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(72, 42, 122);
+      doc.text(`${pct}%`, cx, cy + 1, { align: 'center' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(4.5); doc.setTextColor(138, 148, 168);
+      doc.text('PASS RATE', cx, cy + 5.5, { align: 'center' });
+
+      // Legend
+      const ly = cy + outerR + 6;
+      doc.setFillColor(...hexRgb('#27ae60'));
+      doc.rect(cx - 16, ly - 2.5, 4.5, 3.5, 'F');
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(5.5); doc.setTextColor(50, 50, 80);
+      doc.text(`Pass (${passedRules})`, cx - 10.5, ly);
+      doc.setFillColor(...hexRgb('#e74c3c'));
+      doc.rect(cx + 3, ly - 2.5, 4.5, 3.5, 'F');
+      doc.text(`Fail (${failedRules})`, cx + 8.5, ly);
+    }
+
+    // ── Horizontal bar chart per dimension ──────────────────────
+    function drawBarChart(startX, startY, barW, rowH) {
+      const DIM_COLORS = {
+        'Uniqueness':      '#3498db',
+        'Completeness':    '#e74c3c',
+        'Standardisation': '#f39c12',
+        'Validation':      '#27ae60',
+        'Business Rules':  '#9b59b6'
+      };
+
+      const dimMap = {};
+      assessmentResults.forEach(r => {
+        const dim = r.rule.dimension || 'Other';
+        if (!dimMap[dim]) dimMap[dim] = { total: 0, exceptions: 0 };
+        dimMap[dim].total      += r.total;
+        dimMap[dim].exceptions += r.exceptions.length;
+      });
+      const dims = Object.keys(dimMap);
+      if (!dims.length) return;
+
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(72, 42, 122);
+      doc.text('Exception Rate by Dimension', startX, startY - 3);
+
+      dims.forEach((dim, i) => {
+        const y = startY + i * rowH;
+        const { total, exceptions } = dimMap[dim];
+        const pct = total > 0 ? exceptions / total : 0;
+        const [r, g, b] = hexRgb(DIM_COLORS[dim] || '#888888');
+
+        const label = dim.length > 16 ? dim.slice(0, 15) + '\u2026' : dim;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(50, 50, 80);
+        doc.text(label, startX, y + 2.5);
+
+        const bx = startX + 38;
+        doc.setFillColor(225, 220, 238);
+        doc.rect(bx, y, barW, rowH - 2, 'F');
+        if (pct > 0) {
+          doc.setFillColor(r, g, b);
+          doc.rect(bx, y, Math.max(0.3, pct * barW), rowH - 2, 'F');
+        }
+
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(5.5); doc.setTextColor(r, g, b);
+        doc.text(`${(pct * 100).toFixed(1)}%`, bx + barW + 2, y + 2.5);
+      });
+    }
+
+    // ══════════════════════════════════════════════════
+    // PAGE 1 — Executive Summary
+    // ══════════════════════════════════════════════════
+    drawHeader();
+
+    // KPI cards
+    const kpis = [
+      { label: 'TOTAL RULES',      val: String(totalRules),                color: '#482A7A' },
+      { label: 'PASSED',           val: String(passedRules),               color: '#27ae60' },
+      { label: 'FAILED',           val: String(failedRules),               color: '#e74c3c' },
+      { label: 'TOTAL EXCEPTIONS', val: totalExceptions.toLocaleString(),  color: '#f39c12' }
+    ];
+    const cardW = (W - 20 - 9) / 4;
+    const cardY = 26;
+    kpis.forEach((k, i) => {
+      const kx = 10 + i * (cardW + 3);
+      doc.setFillColor(...hexRgb(k.color));
+      doc.roundedRect(kx, cardY, cardW, 20, 2, 2, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+      doc.text(k.val, kx + cardW / 2, cardY + 11, { align: 'center' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(5);
+      doc.text(k.label, kx + cardW / 2, cardY + 17, { align: 'center' });
+    });
+
+    // Bar chart (left side) and donut (right side)
+    drawBarChart(10, 60, 80, 9);
+    drawDonutChart(163, 78, 22, 11);
+
+    // Separator + note
+    doc.setDrawColor(200, 195, 220); doc.setLineWidth(0.4);
+    doc.line(10, 118, W - 10, 118);
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(6.5); doc.setTextColor(130, 120, 150);
+    doc.text('Full results table on next page', W / 2, 124, { align: 'center' });
+
+    // ══════════════════════════════════════════════════
+    // PAGE 2+ — Full Results Table
+    // ══════════════════════════════════════════════════
+    doc.addPage();
+    drawHeader();
+
+    const tCols = [
+      { label: '#',          x: 10  },
+      { label: 'Rule Name',  x: 18  },
+      { label: 'Dimension',  x: 70  },
+      { label: 'Column(s)',  x: 100 },
+      { label: 'Records',    x: 130 },
+      { label: 'Exceptions', x: 148 },
+      { label: 'Ex %',       x: 166 },
+      { label: 'Status',     x: 181 }
+    ];
+
+    function drawTableHeader(ty) {
+      doc.setFillColor(72, 42, 122);
+      doc.rect(10, ty - 5, W - 20, 7.5, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
+      tCols.forEach(c => doc.text(c.label, c.x + 1, ty));
+    }
+
+    let ty = 27;
+    drawTableHeader(ty);
+    ty += 6;
+
+    assessmentResults.forEach((r, idx) => {
+      if (ty > 280) {
+        doc.addPage();
+        drawHeader();
+        ty = 27;
+        drawTableHeader(ty);
+        ty += 6;
+      }
+
+      if (idx % 2 === 0) {
+        doc.setFillColor(249, 246, 252);
+        doc.rect(10, ty - 4, W - 20, 7, 'F');
+      }
+
+      const exPct  = r.total > 0 ? (r.exceptions.length / r.total * 100).toFixed(1) : '0.0';
+      const isPass = r.exceptions.length === 0;
+      const ruleName = r.rule.label.length > 38
+        ? r.rule.label.slice(0, 37) + '\u2026' : r.rule.label;
+      const colStr   = (r.rule.columns.join('+') || '\u2014');
+      const colName  = colStr.length > 20 ? colStr.slice(0, 19) + '\u2026' : colStr;
+
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(40, 40, 60);
+      doc.text(String(idx + 1),            11,  ty);
+      doc.text(ruleName,                   19,  ty);
+      doc.text(r.rule.dimension || '\u2014', 71, ty);
+      doc.text(colName,                    101, ty);
+      doc.text(r.total.toLocaleString(),   131, ty);
+      doc.text(r.exceptions.length.toLocaleString(), 149, ty);
+      doc.text(exPct + '%',                167, ty);
+
+      // PASS / FAIL badge
+      doc.setFillColor(...hexRgb(isPass ? '#27ae60' : '#e74c3c'));
+      doc.roundedRect(181, ty - 3.5, 16, 5, 1.5, 1.5, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(5.5);
+      doc.text(isPass ? 'PASS' : 'FAIL', 189, ty - 0.5, { align: 'center' });
+
+      ty += 7;
+    });
+
+    doc.save(`DQ_Assessment_${baseName}_${dateStr}.pdf`);
+
+  } catch (e) {
+    console.error(e);
+    alert('PDF export failed: ' + e.message);
+  } finally {
+    btn.textContent = origText;
+    btn.disabled = false;
+  }
 }
 
 /* ============================================================
