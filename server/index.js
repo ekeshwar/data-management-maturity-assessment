@@ -7,6 +7,7 @@ const path = require('path');
 const config = require('./config');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const caseRoutes = require('./routes/cases');
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use(express.static(root));
 // API routes
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/cases', caseRoutes);
 
 // SPA fallback — serve index.html for unknown paths
 app.get('*', (req, res) => {

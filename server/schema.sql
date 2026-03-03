@@ -33,3 +33,36 @@ CREATE TABLE IF NOT EXISTS audit_log (
   ip          VARCHAR(45),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Phase 2: Golden Record Case Management
+
+CREATE TABLE IF NOT EXISTS gr_cases (
+  id           SERIAL PRIMARY KEY,
+  name         VARCHAR(255) NOT NULL,
+  entity_type  VARCHAR(100) NOT NULL DEFAULT 'Generic',
+  status       VARCHAR(50)  NOT NULL DEFAULT 'open',
+  created_by   INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS gr_records (
+  id           SERIAL PRIMARY KEY,
+  case_id      INTEGER REFERENCES gr_cases(id) ON DELETE CASCADE,
+  source_name  VARCHAR(255) NOT NULL DEFAULT 'Source',
+  data         JSONB NOT NULL,
+  row_order    INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS gr_proposals (
+  id           SERIAL PRIMARY KEY,
+  case_id      INTEGER REFERENCES gr_cases(id) ON DELETE CASCADE UNIQUE,
+  proposed_by  INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  golden_data  JSONB NOT NULL,
+  notes        TEXT,
+  status       VARCHAR(50) NOT NULL DEFAULT 'pending',
+  reviewed_by  INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  review_notes TEXT,
+  proposed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  reviewed_at  TIMESTAMPTZ
+);
