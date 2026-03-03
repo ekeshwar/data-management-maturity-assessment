@@ -474,7 +474,7 @@
           <div id="rule-tab-uniqueness" class="rule-tab-panel active">
             <div class="rule-section-title">Uniqueness / Duplicate Detection</div>
             <div class="rule-field-group">
-              <label>Additional columns for composite key (optional):</label>
+              <label>Columns to check for duplicates (select one or more):</label>
               <div id="uniqueness-col-checkboxes" class="checkbox-group"></div>
             </div>
             <div class="rule-field-group">
@@ -586,7 +586,7 @@
       </div>
       <div class="step2-nav">
         <button class="btn btn-outline" onclick="goToStep(1)">← Back</button>
-        <button class="btn btn-success" onclick="goToStep(3)">Run Assessment →</button>
+        <button class="btn btn-success" id="dq-run-btn" onclick="goToStep(3)">Run Assessment →</button>
       </div>
     </div>
 
@@ -1517,8 +1517,12 @@ function goToStep(n) {
       alert('Please configure at least one rule before running the assessment.');
       return;
     }
+    const runBtn = document.getElementById('dq-run-btn');
+    if (runBtn) { runBtn.disabled = true; runBtn.textContent = 'Running...'; }
     showStep(3);
-    runAssessment();
+    runAssessment().finally(() => {
+      if (runBtn) { runBtn.disabled = false; runBtn.textContent = 'Run Assessment →'; }
+    });
     return;
   }
   showStep(n);
@@ -1619,6 +1623,7 @@ function renderColumnList() {
     item.onclick = () => selectColumn(col);
     list.appendChild(item);
   });
+  refreshUniquenessCheckboxes();
   if (columns.length > 0) selectColumn(columns[0]);
 }
 
@@ -1628,13 +1633,12 @@ function selectColumn(col) {
     i.classList.toggle('selected', i.textContent === col);
   });
   document.getElementById('selected-col-label').textContent = `Configuring rules for column: ${col}`;
-  refreshUniquenessCheckboxes();
 }
 
 function refreshUniquenessCheckboxes() {
   const wrap = document.getElementById('uniqueness-col-checkboxes');
   wrap.innerHTML = '';
-  columns.filter(c => c !== selectedColumn).forEach(col => {
+  columns.forEach(col => {
     const lbl = document.createElement('label');
     lbl.innerHTML = `<input type="checkbox" value="${escHtml(col)}"> ${escHtml(col)}`;
     wrap.appendChild(lbl);
@@ -1663,10 +1667,9 @@ document.querySelectorAll('input[name="match-type"]').forEach(r => {
    DQ: ADD RULES
 ============================================================ */
 function addUniquenessRule() {
-  if (!selectedColumn) { alert('Select a column first.'); return; }
+  const allCols = [...document.querySelectorAll('#uniqueness-col-checkboxes input:checked')].map(c => c.value);
+  if (allCols.length === 0) { alert('Select at least one column for the duplicate check.'); return; }
   const matchType = document.querySelector('input[name="match-type"]:checked').value;
-  const extraCols = [...document.querySelectorAll('#uniqueness-col-checkboxes input:checked')].map(c => c.value);
-  const allCols = [selectedColumn, ...extraCols];
   const threshold = parseInt(document.getElementById('fuzzy-slider').value, 10);
   const ruleType = matchType === 'fuzzy' ? 'fuzzy-dup' : 'exact-dup';
   const label = `${matchType === 'fuzzy' ? 'Fuzzy' : 'Exact'} duplicate: ${allCols.join(' + ')}${matchType === 'fuzzy' ? ` (${threshold}% threshold)` : ''}`;
@@ -1827,10 +1830,18 @@ function checkFuzzyDups(rule) {
   return [...flagged].map(i => parsedData[i]);
 }
 
+const SKIP_NULL_RULE_TYPES = new Set([
+  'no-special-chars', 'uppercase', 'lowercase', 'numeric-only',
+  'date-format', 'max-length', 'min-length',
+  'allowed-values', 'numeric-range', 'format-check'
+]);
+
 function passesRule(row, rule) {
   const col = rule.columns[0];
   const val = row[col];
   const str = String(val ?? '');
+  // Standardisation and validation rules treat null/empty as not applicable — skip them
+  if (SKIP_NULL_RULE_TYPES.has(rule.type) && (val == null || str.trim() === '')) return true;
   switch (rule.type) {
     case 'null-check':      return val !== null && val !== undefined && str.trim() !== '';
     case 'no-special-chars': return /^[a-zA-Z0-9\s]*$/.test(str);
@@ -1879,6 +1890,7 @@ async function runAssessment() {
   document.getElementById('run-progress-bar').style.width = '0%';
   document.getElementById('run-progress-label').textContent = 'Starting...';
   assessmentResults = [];
+  await new Promise(r => setTimeout(r, 50)); // allow step 3 UI to render before work begins
 
   // Warn for fuzzy + large files
   const hasFuzzy = configuredRules.some(r => r.type === 'fuzzy-dup');
