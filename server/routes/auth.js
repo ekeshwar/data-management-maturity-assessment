@@ -13,7 +13,12 @@ const { sendOTP } = require('../utils/email');
 const authMiddleware = require('../middleware/auth');
 
 async function verifyCaptcha(token) {
-  if (!config.recaptchaSecret || !token) return false;
+  // Dev mode: skip verification when RECAPTCHA_SECRET is not configured
+  if (!config.recaptchaSecret) {
+    console.warn('[CAPTCHA] RECAPTCHA_SECRET not set — skipping verification (dev mode)');
+    return true;
+  }
+  if (!token) return false;
   try {
     const { data } = await axios.post(
       'https://www.google.com/recaptcha/api/siteverify',

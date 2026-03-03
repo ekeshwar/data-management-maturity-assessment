@@ -7,7 +7,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script>
+    // Only load reCAPTCHA library if a real site key is configured
+    window.RECAPTCHA_SITE_KEY = '__RECAPTCHA_SITE_KEY__';
+    window._CAPTCHA_ENABLED = window.RECAPTCHA_SITE_KEY && !window.RECAPTCHA_SITE_KEY.startsWith('__');
+    if (window._CAPTCHA_ENABLED) {
+      const s = document.createElement('script');
+      s.src = 'https://www.google.com/recaptcha/api.js';
+      s.async = true; s.defer = true;
+      document.head.appendChild(s);
+    }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; background: #FAF2F7; color: #0D0D0D; min-height: 100vh; display: flex; flex-direction: column; }
@@ -101,8 +111,11 @@
         <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password" />
         <div class="field-error" id="login-pw-err">Password is required.</div>
       </div>
-      <div class="captcha-wrap">
+      <div class="captcha-wrap" id="login-captcha-wrap">
         <div class="g-recaptcha" id="login-recaptcha" data-sitekey="__RECAPTCHA_SITE_KEY__"></div>
+        <div id="login-captcha-dev" style="display:none;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:8px 12px;font-size:0.78rem;color:#856404;font-weight:600;">
+          ⚙ Dev mode: CAPTCHA not configured — verification skipped
+        </div>
       </div>
       <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
       <div class="toggle-link">
@@ -133,8 +146,11 @@
         <input type="text" id="reg-name" placeholder="Your full name" autocomplete="name" />
         <div class="field-error" id="reg-name-err">Name is required.</div>
       </div>
-      <div class="captcha-wrap">
+      <div class="captcha-wrap" id="reg-captcha-wrap">
         <div class="g-recaptcha" id="reg-recaptcha" data-sitekey="__RECAPTCHA_SITE_KEY__"></div>
+        <div id="reg-captcha-dev" style="display:none;background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:8px 12px;font-size:0.78rem;color:#856404;font-weight:600;">
+          ⚙ Dev mode: CAPTCHA not configured — verification skipped
+        </div>
       </div>
       <button class="btn btn-primary" id="reg1-btn" onclick="doRegisterRequest()">Send Verification Code</button>
       <div class="toggle-link">
@@ -186,11 +202,15 @@
 </footer>
 
 <script>
-/* ─── Config ─── */
-// Replace __RECAPTCHA_SITE_KEY__ with your actual site key here OR inject via server template.
-// For development without reCAPTCHA, set RECAPTCHA_SITE_KEY to '' (empty) and
-// the server's RECAPTCHA_SECRET can also be left empty to skip verification.
-window.RECAPTCHA_SITE_KEY = '__RECAPTCHA_SITE_KEY__';
+/* ─── Dev mode notice ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window._CAPTCHA_ENABLED) {
+    document.getElementById('login-recaptcha').style.display = 'none';
+    document.getElementById('login-captcha-dev').style.display = 'block';
+    document.getElementById('reg-recaptcha').style.display = 'none';
+    document.getElementById('reg-captcha-dev').style.display = 'block';
+  }
+});
 
 /* ─── State ─── */
 let pendingEmail = '';
@@ -222,8 +242,9 @@ function fieldError(inputId, errId, msg) {
 }
 
 /* ─── reCAPTCHA helper ─── */
-function getCaptchaToken(widgetId) {
-  return typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse(widgetId) : '';
+function getCaptchaToken() {
+  if (!window._CAPTCHA_ENABLED) return '';
+  return typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
 }
 
 /* ─── Login ─── */
@@ -251,7 +272,7 @@ async function doLogin() {
     const data = await res.json();
     if (!res.ok) {
       showAlert('login-alert', data.error || 'Login failed');
-      if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+      if (window._CAPTCHA_ENABLED && typeof grecaptcha !== 'undefined') grecaptcha.reset();
     } else {
       localStorage.setItem('edm_token', data.token);
       localStorage.setItem('edm_user', JSON.stringify(data.user));
@@ -290,7 +311,7 @@ async function doRegisterRequest() {
     const data = await res.json();
     if (!res.ok) {
       showAlert('reg1-alert', data.error || 'Request failed');
-      if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+      if (window._CAPTCHA_ENABLED && typeof grecaptcha !== 'undefined') grecaptcha.reset();
     } else {
       pendingEmail = email;
       document.getElementById('otp-sent-to').textContent = email;
