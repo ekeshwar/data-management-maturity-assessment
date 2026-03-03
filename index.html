@@ -1812,22 +1812,44 @@ function checkExactDups(rule) {
     seen.get(key).push(idx);
   });
   const exceptions = [];
-  seen.forEach(indices => { if (indices.length > 1) indices.forEach(i => exceptions.push(parsedData[i])); });
+  let groupId = 1;
+  seen.forEach(indices => {
+    if (indices.length > 1) {
+      indices.forEach(i => exceptions.push({ 'Duplicate Group': groupId, ...parsedData[i] }));
+      groupId++;
+    }
+  });
   return exceptions;
 }
 
 function checkFuzzyDups(rule) {
   const vals = parsedData.map(r => rule.columns.map(c => String(r[c] ?? '')).join('|'));
   const threshold = (rule.threshold || 85) / 100;
+
+  // Union-Find to cluster transitively similar rows into the same group
+  const parent = Array.from({ length: vals.length }, (_, i) => i);
+  function find(x) { return parent[x] === x ? x : (parent[x] = find(parent[x])); }
+  function union(x, y) { parent[find(x)] = find(y); }
+
   const flagged = new Set();
   for (let i = 0; i < vals.length; i++) {
     for (let j = i + 1; j < vals.length; j++) {
       if (levenshteinSimilarity(vals[i], vals[j]) >= threshold) {
         flagged.add(i); flagged.add(j);
+        union(i, j);
       }
     }
   }
-  return [...flagged].map(i => parsedData[i]);
+
+  // Assign a sequential group ID per connected component
+  const rootToGroup = new Map();
+  let groupId = 1;
+  [...flagged].forEach(i => {
+    const root = find(i);
+    if (!rootToGroup.has(root)) rootToGroup.set(root, groupId++);
+  });
+
+  return [...flagged].map(i => ({ 'Duplicate Group': rootToGroup.get(find(i)), ...parsedData[i] }));
 }
 
 const SKIP_NULL_RULE_TYPES = new Set([
