@@ -4,40 +4,91 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **single-file static webpage** (`index.html`) — a Data Management Maturity Assessment tool. There is no build system, package manager, or server. Open `index.html` directly in any modern browser.
+This is a **multi-file Node.js + Express web application** — an Enterprise Data Management Platform.
+The frontend consists of `index.html` (main app) and `login.html` (auth page).
+The backend is a REST API server under `server/`, using PostgreSQL for persistence.
+
+Run with `npm start` (or `npm run dev` for development with nodemon).
+
+## File Structure
+
+```
+project root/
+├── index.html            ← Main app (DAMA, DQ Assessment, User Management tabs)
+├── login.html            ← Auth page (login + OTP registration)
+├── package.json          ← Node.js manifest
+├── .env                  ← Environment variables (not committed)
+├── .env.example          ← Template for .env
+├── .gitignore
+├── CLAUDE.md
+└── server/
+    ├── index.js          ← Express entry point, mounts all routes, serves static files
+    ├── config.js         ← Reads .env, validates required vars
+    ├── schema.sql        ← PostgreSQL DDL (run once to initialise DB)
+    ├── db/
+    │   └── postgres.js   ← pg Pool + query() helper
+    ├── models/
+    │   ├── User.js       ← User CRUD + OTP helpers
+    │   └── AuditLog.js   ← Append-only audit log writer
+    ├── middleware/
+    │   ├── auth.js       ← JWT Bearer token verification
+    │   └── rbac.js       ← Role gate factory: rbac('admin')
+    ├── routes/
+    │   ├── auth.js       ← POST /login  POST /register/request  POST /register/verify  GET /me
+    │   └── users.js      ← CRUD /users  PATCH role/active  POST/DELETE access
+    └── utils/
+        ├── email.js      ← Nodemailer SMTP OTP sender
+        └── otp.js        ← Generate 6-digit OTP, bcrypt hash + verify
+```
 
 ## Architecture
 
-Everything lives in `index.html` with three embedded sections:
+### Frontend (`index.html`)
+- **Auth guard** (top of `<script>`): verifies JWT via `GET /api/auth/me`; redirects to `login.html` if missing/invalid.
+- **Header user bar**: shows logged-in user name + role + Logout button.
+- **Tab panels**: DAMA Maturity Assessment, Data Quality Assessment, User Management (admin only).
+- **User Management tab**: lists all users, allows role changes, activate/deactivate, invite, and client/master access management.
+- All API calls use `Authorization: Bearer <token>` header from `localStorage.getItem('edm_token')`.
 
-- **`<style>`** — All CSS, including layout, tab bar, pill-style radio buttons, score bar animation, and responsive breakpoints.
-- **`<body>`** — Two tab panels (`#panel-governance`, `#panel-quality`), each containing a `<form>` with 7 radio-button questions and a result panel (`#result-*`).
-- **`<script>`** — Vanilla JS handling tab switching (`switchTab`), form validation, score calculation (`submitForm`), maturity level lookup (`getLevel`), and bar animation.
+### Backend (`server/`)
+- Express app with CORS, JSON body parser, rate limiting on auth routes.
+- Static file serving from project root — `index.html` and `login.html` are served directly.
+- JWT access tokens (8h expiry), bcrypt password hashing, bcrypt OTP hashing.
+- reCAPTCHA v2 verification on login + register/request.
+- Audit log written for all auth and user management actions.
 
 ### Key conventions
+- JWT payload: `{ id, email, role }` — signed with `JWT_SECRET`.
+- Roles: `admin` | `maker` | `checker`.
+- OTP: 6-digit crypto random, bcrypt-hashed in DB, expires in 10 minutes.
+- All API errors return `{ error: "message" }` — stack traces never leak to client.
 
-- Radio button `name` attributes use prefix `g1`–`g7` (Governance tab) and `q1`–`q7` (Quality tab).
-- Result elements follow the pattern: `#score-{domain}-val`, `#badge-{domain}`, `#bar-{domain}`, `#rec-{domain}`, `#result-{domain}`, `#val-{domain}`.
-- Score = average of 7 answers (1–5). Bar fill % = `(score - 1) / 4 * 100`.
-- Maturity levels and recommendation text are defined in the `LEVELS` array in the script — this is the single source of truth for thresholds, colours, and copy.
+## Setup
+
+1. `npm install`
+2. Create a PostgreSQL database.
+3. `psql -f server/schema.sql` to create tables.
+4. Copy `.env.example` → `.env` and fill in all values.
+5. Register at Google reCAPTCHA admin — get site key + secret.
+6. `npm start` (or `npm run dev`).
+7. Open `http://localhost:3000/login.html`.
 
 ## Git & Version Control
 
-After completing any meaningful unit of work, commit the changes and push to GitHub so progress is never lost.
+After completing any meaningful unit of work, commit the changes and push to GitHub.
 
-- **Commit often** — after each feature, fix, or significant edit to `index.html`.
+- **Commit often** — after each feature, fix, or significant edit.
 - **Push immediately** after committing: `git push`.
-- **Commit messages** must be concise and descriptive, following this format:
+- **Commit messages** must be concise and descriptive:
   - `feat: add data lineage tab with 7 questions`
   - `fix: correct bar fill calculation for edge case score=1`
   - `style: improve mobile layout for result panel`
-  - `docs: update CLAUDE.md with git workflow`
+  - `docs: update CLAUDE.md with new architecture`
 - Never batch unrelated changes into a single commit.
-- If the repo is not yet initialised, run `git init`, add the remote, and push before starting work.
 
-### Adding a new tab
+### Adding a new tab to `index.html`
 
 1. Add a `.tab-btn` in the tab bar calling `switchTab('newdomain', this)`.
-2. Add a `.tab-panel` with `id="panel-newdomain"` containing a `<form id="form-newdomain">` with questions using name prefix `n1`–`n7` (or chosen prefix).
-3. Add a `#result-newdomain` result panel with the standard child IDs.
-4. `submitForm('newdomain')` works without changes as long as the prefix matches the radio `name` attributes passed via the `prefix` variable in the function.
+2. Add a `.tab-panel` with `id="panel-newdomain"`.
+3. If the tab needs data, load it inside `switchTab` when `tabId === 'newdomain'`.
+4. Add any new API routes in `server/routes/` and mount them in `server/index.js`.

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In | EDM Platform | Uniqus Consultech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; background: #FAF2F7; color: #0D0D0D; min-height: 100vh; display: flex; flex-direction: column; }
+
+    header { background: linear-gradient(135deg, #482A7A 0%, #B31F7E 100%); color: #fff; padding: 0; box-shadow: 0 3px 12px rgba(72,42,122,0.35); }
+    .header-inner { max-width: 1200px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 14px; }
+    .header-logo-mark { width: 40px; height: 40px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; color: #fff; border: 1.5px solid rgba(255,255,255,0.3); flex-shrink: 0; }
+    .header-text h1 { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
+    .header-text h1 span { font-weight: 800; }
+    .header-text .tagline { font-size: 0.72rem; opacity: 0.78; margin-top: 2px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+    .page-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+
+    .card { background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(72,42,122,0.14); padding: 40px 44px; width: 100%; max-width: 440px; }
+    .card-title { font-size: 1.35rem; font-weight: 800; color: #482A7A; margin-bottom: 6px; }
+    .card-sub { font-size: 0.83rem; color: #667; margin-bottom: 28px; }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 0.82rem; font-weight: 600; color: #482A7A; margin-bottom: 6px; }
+    .field input { width: 100%; padding: 10px 14px; border: 1.5px solid #c8cedc; border-radius: 8px; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.15s; background: #FAFBFD; }
+    .field input:focus { border-color: #482A7A; background: #fff; }
+    .field input.error { border-color: #e74c3c; background: #fdecea; }
+
+    .field-error { font-size: 0.76rem; color: #c0392b; font-weight: 600; margin-top: 4px; display: none; }
+    .field-error.visible { display: block; }
+
+    .btn { display: block; width: 100%; padding: 12px; font-size: 0.93rem; font-weight: 700; border: none; border-radius: 25px; cursor: pointer; font-family: inherit; transition: background 0.18s, transform 0.1s; }
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn-primary { background: linear-gradient(135deg, #482A7A 0%, #B31F7E 100%); color: #fff; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .toggle-link { text-align: center; margin-top: 20px; font-size: 0.83rem; color: #667; }
+    .toggle-link a { color: #B31F7E; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .toggle-link a:hover { text-decoration: underline; }
+
+    .alert { padding: 11px 14px; border-radius: 8px; font-size: 0.84rem; font-weight: 600; margin-bottom: 18px; display: none; }
+    .alert.visible { display: block; }
+    .alert-error { background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; }
+    .alert-success { background: #E8F8EB; color: #1e7a3a; border: 1px solid #a3d9a5; }
+
+    .captcha-wrap { margin-bottom: 18px; }
+
+    .step-indicator { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; font-size: 0.8rem; font-weight: 600; color: #8a94a8; }
+    .step-dot { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #c8cedc; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+    .step-dot.active { border-color: #482A7A; background: #482A7A; color: #fff; }
+    .step-dot.done { border-color: #61CE70; background: #61CE70; color: #fff; }
+    .step-line { flex: 1; height: 2px; background: #e2e6f0; }
+    .step-line.done { background: #61CE70; }
+
+    .otp-hint { background: #EDE5F5; border-radius: 8px; padding: 10px 14px; font-size: 0.8rem; color: #482A7A; font-weight: 600; margin-bottom: 18px; }
+
+    footer { background: linear-gradient(135deg, #482A7A 0%, #B31F7E 100%); color: rgba(255,255,255,0.75); text-align: center; padding: 16px 20px; font-size: 0.75rem; }
+    footer strong { color: #fff; }
+
+    @media (max-width: 500px) { .card { padding: 28px 20px; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-logo-mark">U</div>
+    <div class="header-text">
+      <h1><span>Uniqus</span> Consultech</h1>
+      <div class="tagline">Change the way consulting is done</div>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="card">
+
+    <!-- ─── LOGIN VIEW ─── -->
+    <div class="view active" id="view-login">
+      <div class="card-title">Sign In</div>
+      <div class="card-sub">Access the Enterprise Data Management Platform</div>
+
+      <div class="alert alert-error" id="login-alert"></div>
+
+      <div class="field">
+        <label for="login-email">Email address</label>
+        <input type="email" id="login-email" placeholder="you@company.com" autocomplete="email" />
+        <div class="field-error" id="login-email-err">Please enter a valid email address.</div>
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password" />
+        <div class="field-error" id="login-pw-err">Password is required.</div>
+      </div>
+      <div class="captcha-wrap">
+        <div class="g-recaptcha" id="login-recaptcha" data-sitekey="__RECAPTCHA_SITE_KEY__"></div>
+      </div>
+      <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+      <div class="toggle-link">
+        Don't have an account? <a onclick="showView('register-step1')">Request access</a>
+      </div>
+    </div>
+
+    <!-- ─── REGISTER STEP 1: email + name ─── -->
+    <div class="view" id="view-register-step1">
+      <div class="card-title">Request Access</div>
+      <div class="card-sub">We'll send a one-time code to your email to verify your account.</div>
+
+      <div class="step-indicator">
+        <div class="step-dot active" id="reg-dot-1">1</div>
+        <div class="step-line" id="reg-line-1"></div>
+        <div class="step-dot" id="reg-dot-2">2</div>
+      </div>
+
+      <div class="alert alert-error" id="reg1-alert"></div>
+
+      <div class="field">
+        <label for="reg-email">Email address</label>
+        <input type="email" id="reg-email" placeholder="you@company.com" autocomplete="email" />
+        <div class="field-error" id="reg-email-err">Please enter a valid email address.</div>
+      </div>
+      <div class="field">
+        <label for="reg-name">Full name</label>
+        <input type="text" id="reg-name" placeholder="Your full name" autocomplete="name" />
+        <div class="field-error" id="reg-name-err">Name is required.</div>
+      </div>
+      <div class="captcha-wrap">
+        <div class="g-recaptcha" id="reg-recaptcha" data-sitekey="__RECAPTCHA_SITE_KEY__"></div>
+      </div>
+      <button class="btn btn-primary" id="reg1-btn" onclick="doRegisterRequest()">Send Verification Code</button>
+      <div class="toggle-link">
+        Already have an account? <a onclick="showView('login')">Sign in</a>
+      </div>
+    </div>
+
+    <!-- ─── REGISTER STEP 2: OTP + password ─── -->
+    <div class="view" id="view-register-step2">
+      <div class="card-title">Verify &amp; Set Password</div>
+      <div class="card-sub">Enter the 6-digit code sent to your email and choose a password.</div>
+
+      <div class="step-indicator">
+        <div class="step-dot done" id="reg2-dot-1">✓</div>
+        <div class="step-line done" id="reg2-line-1"></div>
+        <div class="step-dot active" id="reg2-dot-2">2</div>
+      </div>
+
+      <div class="otp-hint" id="otp-email-hint">Code sent to: <span id="otp-sent-to"></span></div>
+      <div class="alert alert-error" id="reg2-alert"></div>
+
+      <div class="field">
+        <label for="reg-otp">Verification code</label>
+        <input type="text" id="reg-otp" placeholder="6-digit code" maxlength="6" autocomplete="one-time-code"
+               style="letter-spacing:0.2em;font-size:1.1rem;text-align:center;" />
+        <div class="field-error" id="reg-otp-err">Enter the 6-digit code from your email.</div>
+      </div>
+      <div class="field">
+        <label for="reg-pw">New password</label>
+        <input type="password" id="reg-pw" placeholder="At least 8 characters" autocomplete="new-password" />
+        <div class="field-error" id="reg-pw-err">Password must be at least 8 characters.</div>
+      </div>
+      <div class="field">
+        <label for="reg-pw2">Confirm password</label>
+        <input type="password" id="reg-pw2" placeholder="Re-enter password" autocomplete="new-password" />
+        <div class="field-error" id="reg-pw2-err">Passwords do not match.</div>
+      </div>
+      <button class="btn btn-primary" id="reg2-btn" onclick="doRegisterVerify()">Create Account &amp; Sign In</button>
+      <div class="toggle-link">
+        <a onclick="showView('register-step1')">← Back</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  &copy; 2026 <strong>Uniqus Consultech Inc.</strong> &nbsp;|&nbsp; Enterprise Data Management Platform
+</footer>
+
+<script>
+/* ─── Config ─── */
+// Replace __RECAPTCHA_SITE_KEY__ with your actual site key here OR inject via server template.
+// For development without reCAPTCHA, set RECAPTCHA_SITE_KEY to '' (empty) and
+// the server's RECAPTCHA_SECRET can also be left empty to skip verification.
+window.RECAPTCHA_SITE_KEY = '__RECAPTCHA_SITE_KEY__';
+
+/* ─── State ─── */
+let pendingEmail = '';
+
+/* ─── View switching ─── */
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  clearAlerts();
+}
+
+function clearAlerts() {
+  document.querySelectorAll('.alert').forEach(a => { a.classList.remove('visible'); a.textContent = ''; });
+  document.querySelectorAll('.field input').forEach(i => i.classList.remove('error'));
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('visible'));
+}
+
+function showAlert(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function fieldError(inputId, errId, msg) {
+  document.getElementById(inputId).classList.add('error');
+  const e = document.getElementById(errId);
+  if (msg) e.textContent = msg;
+  e.classList.add('visible');
+}
+
+/* ─── reCAPTCHA helper ─── */
+function getCaptchaToken(widgetId) {
+  return typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse(widgetId) : '';
+}
+
+/* ─── Login ─── */
+async function doLogin() {
+  clearAlerts();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  let ok = true;
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { fieldError('login-email', 'login-email-err'); ok = false; }
+  if (!password) { fieldError('login-password', 'login-pw-err'); ok = false; }
+  if (!ok) return;
+
+  const captchaToken = getCaptchaToken();
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, captchaToken }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showAlert('login-alert', data.error || 'Login failed');
+      if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+    } else {
+      localStorage.setItem('edm_token', data.token);
+      localStorage.setItem('edm_user', JSON.stringify(data.user));
+      window.location.href = 'index.html';
+    }
+  } catch {
+    showAlert('login-alert', 'Network error — please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+}
+
+/* ─── Register Step 1 ─── */
+async function doRegisterRequest() {
+  clearAlerts();
+  const email = document.getElementById('reg-email').value.trim();
+  const name = document.getElementById('reg-name').value.trim();
+
+  let ok = true;
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { fieldError('reg-email', 'reg-email-err'); ok = false; }
+  if (!name) { fieldError('reg-name', 'reg-name-err'); ok = false; }
+  if (!ok) return;
+
+  const captchaToken = getCaptchaToken();
+  const btn = document.getElementById('reg1-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const res = await fetch('/api/auth/register/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, name, captchaToken }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showAlert('reg1-alert', data.error || 'Request failed');
+      if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+    } else {
+      pendingEmail = email;
+      document.getElementById('otp-sent-to').textContent = email;
+      showView('register-step2');
+    }
+  } catch {
+    showAlert('reg1-alert', 'Network error — please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send Verification Code';
+  }
+}
+
+/* ─── Register Step 2 ─── */
+async function doRegisterVerify() {
+  clearAlerts();
+  const otp = document.getElementById('reg-otp').value.trim();
+  const pw = document.getElementById('reg-pw').value;
+  const pw2 = document.getElementById('reg-pw2').value;
+
+  let ok = true;
+  if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) { fieldError('reg-otp', 'reg-otp-err'); ok = false; }
+  if (!pw || pw.length < 8) { fieldError('reg-pw', 'reg-pw-err'); ok = false; }
+  if (pw !== pw2) { fieldError('reg-pw2', 'reg-pw2-err'); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById('reg2-btn');
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+
+  try {
+    const res = await fetch('/api/auth/register/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: pendingEmail, otp, password: pw }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showAlert('reg2-alert', data.error || 'Verification failed');
+    } else {
+      localStorage.setItem('edm_token', data.token);
+      localStorage.setItem('edm_user', JSON.stringify(data.user));
+      window.location.href = 'index.html';
+    }
+  } catch {
+    showAlert('reg2-alert', 'Network error — please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Account & Sign In';
+  }
+}
+
+/* ─── Enter key support ─── */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const active = document.querySelector('.view.active');
+  if (!active) return;
+  if (active.id === 'view-login') doLogin();
+  else if (active.id === 'view-register-step1') doRegisterRequest();
+  else if (active.id === 'view-register-step2') doRegisterVerify();
+});
+</script>
+</body>
+</html>
