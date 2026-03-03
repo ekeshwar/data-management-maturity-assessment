@@ -1789,19 +1789,25 @@ function renderRulesList() {
 /* ============================================================
    DQ: ASSESSMENT ENGINE
 ============================================================ */
-function levenshteinSimilarity(a, b) {
+function levenshteinSimilarity(a, b, minSimilarity = 0) {
   const la = a.length, lb = b.length;
   if (!la && !lb) return 1;
   if (!la || !lb) return 0;
-  const dp = [];
-  for (let i = 0; i <= la; i++) { dp[i] = []; dp[i][0] = i; }
-  for (let j = 0; j <= lb; j++) dp[0][j] = j;
+  const maxDist = Math.max(la, lb);
+  // Early exit: length difference alone makes target similarity unreachable
+  if (1 - Math.abs(la - lb) / maxDist < minSimilarity) return 0;
+  // Rolling two-row DP — O(lb) space instead of O(la * lb)
+  let prev = Array.from({ length: lb + 1 }, (_, k) => k);
+  let curr = new Array(lb + 1);
   for (let i = 1; i <= la; i++) {
+    curr[0] = i;
     for (let j = 1; j <= lb; j++) {
-      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+      curr[j] = a[i - 1] === b[j - 1] ? prev[j - 1]
+        : 1 + Math.min(prev[j], curr[j - 1], prev[j - 1]);
     }
+    [prev, curr] = [curr, prev]; // swap row references — no reallocation
   }
-  return 1 - dp[la][lb] / Math.max(la, lb);
+  return 1 - prev[lb] / maxDist;
 }
 
 function checkExactDups(rule) {
@@ -1822,22 +1828,32 @@ function checkExactDups(rule) {
   return exceptions;
 }
 
-function checkFuzzyDups(rule) {
+async function checkFuzzyDups(rule, progressCb) {
   const vals = parsedData.map(r => rule.columns.map(c => String(r[c] ?? '')).join('|'));
   const threshold = (rule.threshold || 85) / 100;
+  const n = vals.length;
 
   // Union-Find to cluster transitively similar rows into the same group
-  const parent = Array.from({ length: vals.length }, (_, i) => i);
+  const parent = Array.from({ length: n }, (_, i) => i);
   function find(x) { return parent[x] === x ? x : (parent[x] = find(parent[x])); }
   function union(x, y) { parent[find(x)] = find(y); }
 
   const flagged = new Set();
-  for (let i = 0; i < vals.length; i++) {
-    for (let j = i + 1; j < vals.length; j++) {
-      if (levenshteinSimilarity(vals[i], vals[j]) >= threshold) {
+  let lastYield = Date.now();
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      // Pass threshold so levenshteinSimilarity can early-exit impossible pairs
+      if (levenshteinSimilarity(vals[i], vals[j], threshold) >= threshold) {
         flagged.add(i); flagged.add(j);
         union(i, j);
       }
+    }
+    // Yield to the browser every ~16 ms (one frame) so the UI stays responsive
+    if (Date.now() - lastYield >= 16) {
+      progressCb && progressCb(i / n);
+      await new Promise(r => setTimeout(r, 0));
+      lastYield = Date.now();
     }
   }
 
@@ -1850,6 +1866,17 @@ function checkFuzzyDups(rule) {
   });
 
   return [...flagged].map(i => ({ 'Duplicate Group': rootToGroup.get(find(i)), ...parsedData[i] }));
+}
+
+// Async chunked filter for non-dup rules — yields every 5 000 rows so large files
+// don't freeze the page between progress bar updates
+async function filterRowsChunked(rule) {
+  const exceptions = [];
+  for (let i = 0; i < parsedData.length; i++) {
+    if (!passesRule(parsedData[i], rule)) exceptions.push(parsedData[i]);
+    if (i % 5000 === 4999) await new Promise(r => setTimeout(r, 0));
+  }
+  return exceptions;
 }
 
 const SKIP_NULL_RULE_TYPES = new Set([
@@ -1916,23 +1943,39 @@ async function runAssessment() {
 
   // Warn for fuzzy + large files
   const hasFuzzy = configuredRules.some(r => r.type === 'fuzzy-dup');
-  if (hasFuzzy && totalRows > 5000) {
-    const proceed = confirm(`Warning: Fuzzy duplicate checking on ${totalRows.toLocaleString()} rows is O(n²) and may take a long time. Proceed?`);
+  if (hasFuzzy && totalRows > 2000) {
+    const proceed = confirm(`Warning: Fuzzy duplicate checking on ${totalRows.toLocaleString()} rows is computationally intensive (O(n²)). The page will stay responsive but the assessment may take several minutes. Proceed?`);
     if (!proceed) { showStep(2); return; }
   }
 
+  const progressBar   = document.getElementById('run-progress-bar');
+  const progressLabel = document.getElementById('run-progress-label');
+
   for (let i = 0; i < configuredRules.length; i++) {
-    const rule = configuredRules[i];
-    document.getElementById('run-progress-label').textContent = `Evaluating: ${rule.label}`;
-    document.getElementById('run-progress-bar').style.width = Math.round(i / totalRules * 100) + '%';
+    const rule     = configuredRules[i];
+    const ruleBase = i / totalRules;       // fraction of total work before this rule
+    const ruleSlot = 1 / totalRules;       // fraction of total work this rule owns
+
+    const setProgress = (withinRule, label) => {
+      progressBar.style.width   = Math.round((ruleBase + withinRule * ruleSlot) * 100) + '%';
+      progressLabel.textContent = label;
+    };
+
+    setProgress(0, `Evaluating: ${rule.label}`);
 
     let exceptions = [];
-    if (rule.type === 'exact-dup') exceptions = checkExactDups(rule);
-    else if (rule.type === 'fuzzy-dup') exceptions = checkFuzzyDups(rule);
-    else exceptions = parsedData.filter(row => !passesRule(row, rule));
+    if (rule.type === 'exact-dup') {
+      exceptions = checkExactDups(rule);
+    } else if (rule.type === 'fuzzy-dup') {
+      exceptions = await checkFuzzyDups(rule, p =>
+        setProgress(p, `Evaluating: ${rule.label} — ${Math.round(p * 100)}% scanned`)
+      );
+    } else {
+      exceptions = await filterRowsChunked(rule);
+    }
 
     assessmentResults.push({ rule, total: totalRows, exceptions });
-    await new Promise(r => setTimeout(r, 0)); // yield to browser
+    setProgress(1, `Evaluating: ${rule.label}`);
   }
 
   document.getElementById('run-progress-bar').style.width = '100%';
