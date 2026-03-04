@@ -760,14 +760,37 @@
 
     <!-- Cases List View -->
     <div id="gr-list-view">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:12px;">
         <div>
           <h2 style="font-size:1.12rem;font-weight:700;color:#482A7A;margin-bottom:3px;">Golden Record Cases</h2>
           <p style="font-size:0.82rem;color:#667;">Upload duplicates, propose a golden record, and get it approved.</p>
         </div>
-        <button class="btn btn-primary" id="gr-new-case-btn" onclick="openGRModal()">+ New Case</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;" id="gr-action-btns">
+          <button class="btn btn-outline btn-sm" id="gr-download-btn" onclick="bulkDownloadGR()" title="Download your open/rejected cases as an Excel workbook to fill offline">&#11015; Download Workbook</button>
+          <label class="btn btn-outline btn-sm" id="gr-upload-btn" style="cursor:pointer;" title="Upload the filled workbook to submit proposals in bulk">&#11014; Upload Proposals<input type="file" id="gr-bulk-upload-input" accept=".xlsx,.xls,.csv" style="display:none;" onchange="grHandleBulkUpload(this)" /></label>
+          <button class="btn btn-primary btn-sm" id="gr-new-case-btn" onclick="openGRModal()">+ New Case</button>
+        </div>
       </div>
       <div id="gr-list-alert" class="gr-alert"></div>
+
+      <!-- Bulk upload preview (shown after parsing uploaded workbook) -->
+      <div id="gr-bulk-preview" style="display:none;background:#F7F5F9;border:1px solid #e2e6f0;border-radius:10px;padding:18px;margin-bottom:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-size:0.95rem;font-weight:700;color:#482A7A;" id="gr-bulk-preview-title"></div>
+          <button class="btn btn-outline btn-sm" onclick="cancelBulkPreview()">Cancel</button>
+        </div>
+        <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:8px;background:#fff;margin-bottom:14px;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.8rem;" id="gr-bulk-preview-table">
+            <thead><tr style="background:linear-gradient(90deg,#482A7A,#B31F7E);">
+              <th style="padding:8px 12px;text-align:left;color:#fff;font-weight:700;">Case</th>
+              <th style="padding:8px 12px;text-align:left;color:#fff;font-weight:700;">Fields</th>
+              <th style="padding:8px 12px;text-align:left;color:#fff;font-weight:700;">Status</th>
+            </tr></thead>
+            <tbody id="gr-bulk-preview-tbody"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-primary" id="gr-bulk-submit-btn" onclick="submitBulkProposals()">Submit All Proposals</button>
+      </div>
       <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:10px;">
         <table class="gr-table" id="gr-cases-table">
           <thead>
@@ -2903,10 +2926,12 @@ async function loadGRCases() {
     document.getElementById('gr-cases-tbody').innerHTML =
       '<tr><td colspan="7" style="padding:30px;text-align:center;color:#e74c3c;">Failed to load cases.</td></tr>';
   }
-  // Show/hide New Case button based on role
-  const btn = document.getElementById('gr-new-case-btn');
+  // Show/hide maker-only controls based on role
   const role = window.EDM_USER ? window.EDM_USER.role : '';
-  btn.style.display = (role === 'admin' || role === 'maker') ? '' : 'none';
+  const isMakerOrAdmin = role === 'admin' || role === 'maker';
+  document.getElementById('gr-new-case-btn').style.display = isMakerOrAdmin ? '' : 'none';
+  document.getElementById('gr-download-btn').style.display = isMakerOrAdmin ? '' : 'none';
+  document.getElementById('gr-upload-btn').style.display = isMakerOrAdmin ? '' : 'none';
 }
 
 function renderGRCases(cases) {
@@ -3339,6 +3364,162 @@ async function submitNewCase() {
   } else {
     btn.textContent = `Create ${entries.length} Case${entries.length !== 1 ? 's' : ''}`;
     grModalAlert(`${created} case(s) created, ${failed} failed. Please retry.`, true);
+  }
+}
+
+// ── Bulk Download
+async function bulkDownloadGR() {
+  const btn = document.getElementById('gr-download-btn');
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Downloading…';
+  try {
+    const res = await fetch('/api/cases/bulk-download', { headers: authHeaders() });
+    if (!res.ok) throw new Error((await res.json()).error || 'Error');
+    const { cases } = await res.json();
+    if (cases.length === 0) { grListAlert('No open or rejected cases to download.', true); return; }
+    buildBulkWorkbook(cases);
+  } catch (e) {
+    grListAlert(e.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = orig;
+  }
+}
+
+function buildBulkWorkbook(cases) {
+  // Collect union of all data fields across all cases
+  const allFields = [];
+  const seen = new Set();
+  cases.forEach(c => c.records.forEach(r => {
+    Object.keys(r.data).forEach(k => { if (!seen.has(k)) { seen.add(k); allFields.push(k); } });
+  }));
+
+  const SYS = ['_case_id', '_case_name', '_row_type', '_notes'];
+  const headers = [...SYS, ...allFields];
+  const aoa = [headers]; // array-of-arrays for XLSX
+
+  cases.forEach(c => {
+    // Source rows (read-only reference)
+    c.records.forEach(r => {
+      const row = [c.id, c.name, 'source', ''];
+      allFields.forEach(f => row.push(r.data[f] !== undefined ? r.data[f] : ''));
+      aoa.push(row);
+    });
+    // Golden row — maker fills this in
+    const golden = [c.id, c.name, 'golden', ''];
+    allFields.forEach(() => golden.push(''));
+    aoa.push(golden);
+    // Blank separator for readability
+    aoa.push(new Array(headers.length).fill(''));
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  // Style the header row bold by setting !cols widths (basic)
+  ws['!cols'] = headers.map((h, i) => ({ wch: i < 4 ? 22 : Math.max(14, h.length + 4) }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Golden Records');
+  XLSX.writeFile(wb, 'golden_records_workbook.xlsx');
+  grListAlert(`Downloaded ${cases.length} case(s). Fill the "golden" rows and upload back.`, false);
+}
+
+// ── Bulk Upload Proposals
+let _bulkProposals = []; // parsed proposals waiting for confirmation
+
+function grHandleBulkUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = ''; // reset so same file can be re-uploaded
+  const reader = new FileReader();
+  reader.onload = e => parseBulkWorkbook(e.target.result);
+  reader.readAsArrayBuffer(file);
+}
+
+function parseBulkWorkbook(arrayBuffer) {
+  try {
+    const wb = XLSX.read(arrayBuffer, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+    const goldenRows = rows.filter(r => String(r['_row_type']).trim().toLowerCase() === 'golden');
+    if (goldenRows.length === 0) {
+      grListAlert('No golden rows found. Rows must have "_row_type" = "golden".', true); return;
+    }
+
+    _bulkProposals = goldenRows.map(row => {
+      const case_id = parseInt(row['_case_id'], 10);
+      const case_name = String(row['_case_name'] || '');
+      const notes = String(row['_notes'] || '');
+      const golden_data = {};
+      Object.keys(row).forEach(k => {
+        if (!['_case_id', '_case_name', '_row_type', '_notes'].includes(k)) {
+          const v = String(row[k] !== undefined ? row[k] : '');
+          if (v !== '') golden_data[k] = v; // only include non-empty fields
+        }
+      });
+      return { case_id, case_name, golden_data, notes };
+    }).filter(p => !isNaN(p.case_id));
+
+    if (_bulkProposals.length === 0) {
+      grListAlert('Could not parse any valid golden rows (check _case_id column is numeric).', true); return;
+    }
+    renderBulkPreview(_bulkProposals);
+  } catch (e) {
+    grListAlert('Could not parse file: ' + e.message, true);
+  }
+}
+
+function renderBulkPreview(proposals) {
+  document.getElementById('gr-bulk-preview-title').textContent =
+    `${proposals.length} golden record proposal(s) ready to submit`;
+  document.getElementById('gr-bulk-preview-tbody').innerHTML = proposals.map((p, i) => {
+    const fields = Object.keys(p.golden_data).length;
+    const hasData = fields > 0;
+    return `<tr style="${i % 2 === 0 ? 'background:#F7F5F9;' : ''}">
+      <td style="padding:7px 12px;font-weight:600;">${escHtml(p.case_name || String(p.case_id))}</td>
+      <td style="padding:7px 12px;color:#667;">${fields} field(s) filled</td>
+      <td style="padding:7px 12px;">${hasData
+        ? '<span style="color:#065f46;font-weight:700;">Ready</span>'
+        : '<span style="color:#c0392b;font-weight:700;">Empty — skipped</span>'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('gr-bulk-preview').style.display = '';
+  document.getElementById('gr-bulk-submit-btn').disabled = !proposals.some(p => Object.keys(p.golden_data).length > 0);
+}
+
+function cancelBulkPreview() {
+  _bulkProposals = [];
+  document.getElementById('gr-bulk-preview').style.display = 'none';
+}
+
+async function submitBulkProposals() {
+  const toSubmit = _bulkProposals.filter(p => Object.keys(p.golden_data).length > 0);
+  if (toSubmit.length === 0) { grListAlert('Nothing to submit — all golden rows are empty.', true); return; }
+
+  const btn = document.getElementById('gr-bulk-submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  try {
+    const res = await fetch('/api/cases/bulk-proposal', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ proposals: toSubmit.map(p => ({ case_id: p.case_id, golden_data: p.golden_data, notes: p.notes })) }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error || 'Server error');
+    const { results } = await res.json();
+    const ok = results.filter(r => r.status === 'ok').length;
+    const failed = results.filter(r => r.status === 'error');
+
+    cancelBulkPreview();
+    loadGRCases();
+
+    if (failed.length === 0) {
+      grListAlert(`${ok} proposal(s) submitted successfully.`, false);
+    } else {
+      grListAlert(`${ok} submitted, ${failed.length} failed: ${failed.map(f => `Case ${f.case_id}: ${f.error}`).join('; ')}`, true);
+    }
+  } catch (e) {
+    grListAlert(e.message, true);
+    btn.disabled = false; btn.textContent = 'Submit All Proposals';
   }
 }
 

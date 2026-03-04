@@ -110,4 +110,25 @@ async function reviewProposal({ caseId, reviewedBy, status, reviewNotes }) {
   );
 }
 
-module.exports = { create, addRecords, listAll, findById, deleteById, createProposal, reviewProposal };
+// Returns open/rejected cases — admin sees all, maker sees only cases they created
+async function listActionable(userId, role) {
+  const sql = role === 'admin'
+    ? `SELECT c.id, c.name, c.entity_type, c.status, c.created_by
+       FROM gr_cases c WHERE c.status IN ('open','rejected') ORDER BY c.created_at DESC`
+    : `SELECT c.id, c.name, c.entity_type, c.status, c.created_by
+       FROM gr_cases c WHERE c.status IN ('open','rejected') AND c.created_by = $1 ORDER BY c.created_at DESC`;
+  const res = await query(sql, role === 'admin' ? [] : [userId]);
+  return res.rows;
+}
+
+async function getRecordsByCaseIds(caseIds) {
+  if (!caseIds.length) return [];
+  const res = await query(
+    `SELECT case_id, source_name, data, row_order
+     FROM gr_records WHERE case_id = ANY($1) ORDER BY case_id, row_order`,
+    [caseIds]
+  );
+  return res.rows;
+}
+
+module.exports = { create, addRecords, listAll, findById, deleteById, createProposal, reviewProposal, listActionable, getRecordsByCaseIds };

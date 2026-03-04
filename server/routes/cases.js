@@ -33,6 +33,63 @@ router.post('/', rbac('admin', 'maker'), async (req, res, next) => {
   }
 });
 
+// GET /api/cases/bulk-download — actionable cases + records for bulk workbook (admin, maker)
+// Must be defined before /:id to avoid param conflict
+router.get('/bulk-download', rbac('admin', 'maker'), async (req, res, next) => {
+  try {
+    const cases = await Case.listActionable(req.user.id, req.user.role);
+    if (cases.length === 0) return res.json({ cases: [] });
+    const records = await Case.getRecordsByCaseIds(cases.map(c => c.id));
+    const byCase = {};
+    records.forEach(r => {
+      if (!byCase[r.case_id]) byCase[r.case_id] = [];
+      byCase[r.case_id].push(r);
+    });
+    res.json({ cases: cases.map(c => ({ ...c, records: byCase[c.id] || [] })) });
+  } catch (err) { next(err); }
+});
+
+// POST /api/cases/bulk-proposal — submit proposals for multiple cases (admin, maker)
+router.post('/bulk-proposal', rbac('admin', 'maker'), async (req, res, next) => {
+  try {
+    const { proposals } = req.body;
+    if (!Array.isArray(proposals) || proposals.length === 0) {
+      return res.status(400).json({ error: 'proposals array is required' });
+    }
+    const results = [];
+    for (const p of proposals) {
+      const caseId = parseInt(p.case_id, 10);
+      if (isNaN(caseId) || !p.golden_data || typeof p.golden_data !== 'object') {
+        results.push({ case_id: p.case_id, status: 'error', error: 'invalid payload' });
+        continue;
+      }
+      // Privilege check: maker can only propose on their own cases
+      if (req.user.role === 'maker') {
+        const gr = await Case.findById(caseId);
+        if (!gr) { results.push({ case_id: caseId, status: 'error', error: 'not found' }); continue; }
+        if (gr.created_by !== req.user.id) {
+          results.push({ case_id: caseId, status: 'error', error: 'not your case' }); continue;
+        }
+        if (gr.status === 'approved') {
+          results.push({ case_id: caseId, status: 'error', error: 'already approved' }); continue;
+        }
+      }
+      try {
+        await Case.createProposal({ caseId, proposedBy: req.user.id, goldenData: p.golden_data, notes: p.notes || null });
+        await AuditLog.log({
+          userId: req.user.id, userEmail: req.user.email, userRole: req.user.role,
+          action: 'submit_proposal', entityType: 'gr_case', entityId: caseId,
+          detail: { bulk: true, notes: p.notes || null }, ip: req.ip,
+        });
+        results.push({ case_id: caseId, status: 'ok' });
+      } catch (e) {
+        results.push({ case_id: caseId, status: 'error', error: e.message });
+      }
+    }
+    res.json({ results });
+  } catch (err) { next(err); }
+});
+
 // GET /api/cases — list all (admin, maker, checker)
 router.get('/', rbac('admin', 'maker', 'checker'), async (req, res, next) => {
   try {
