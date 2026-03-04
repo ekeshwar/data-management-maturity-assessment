@@ -294,6 +294,59 @@
       .overall-score-card { gap: 18px; padding: 18px; }
       .overall-score-num { font-size: 2.4rem; }
     }
+
+    /* ===================== GOLDEN RECORDS MODULE ===================== */
+    #panel-golden { background: #fff; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(72,42,122,0.12); min-height: 600px; padding: 26px 30px; }
+
+    .gr-status-badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 0.74rem; font-weight: 700; text-transform: capitalize; }
+    .gr-status-open     { background: #e8eaed; color: #555; }
+    .gr-status-proposed { background: #dbeafe; color: #1d4ed8; }
+    .gr-status-approved { background: #d1fae5; color: #065f46; }
+    .gr-status-rejected { background: #fdecea; color: #c0392b; }
+
+    .gr-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    .gr-table th { background: linear-gradient(90deg,#482A7A,#B31F7E); color: #fff; padding: 9px 13px; text-align: left; white-space: nowrap; font-size: 0.8rem; }
+    .gr-table td { padding: 8px 13px; border-bottom: 1px solid #eaecf2; vertical-align: middle; }
+    .gr-table tr:last-child td { border-bottom: none; }
+    .gr-table tr:nth-child(even) { background: #F7F5F9; }
+
+    /* Records side-by-side table */
+    .gr-records-table-wrap { overflow-x: auto; border: 1px solid #e2e6f0; border-radius: 8px; margin-bottom: 22px; }
+    .gr-records-table { border-collapse: collapse; font-size: 0.8rem; min-width: 100%; }
+    .gr-records-table th { background: #EDE5F5; color: #482A7A; font-weight: 700; padding: 8px 12px; text-align: left; white-space: nowrap; border-bottom: 2px solid #DDD0EE; }
+    .gr-records-table td { padding: 7px 12px; border-bottom: 1px solid #eaecf2; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+    .gr-records-table tr:last-child td { border-bottom: none; }
+    .gr-records-table .source-header { background: linear-gradient(90deg,#482A7A,#B31F7E); color: #fff; }
+
+    /* Field selector chips */
+    .gr-field-row { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-bottom: 1px solid #eaecf2; }
+    .gr-field-row:last-of-type { border-bottom: none; }
+    .gr-field-label { font-size: 0.82rem; font-weight: 700; color: #482A7A; margin-bottom: 4px; }
+    .gr-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .gr-chip { padding: 5px 12px; border-radius: 20px; border: 2px solid #c8cedc; background: #F7F5F9; font-size: 0.78rem; cursor: pointer; transition: border-color 0.15s, background 0.15s; user-select: none; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gr-chip:hover { border-color: #482A7A; background: #EDE5F5; }
+    .gr-chip.selected { border-color: #482A7A; background: #482A7A; color: #fff; font-weight: 600; }
+    .gr-chip-label { font-size: 0.68rem; color: #8a94a8; margin-right: 4px; }
+    .gr-override-input { padding: 5px 10px; border: 1px solid #c8cedc; border-radius: 6px; font-size: 0.82rem; font-family: inherit; outline: none; width: 200px; }
+    .gr-override-input:focus { border-color: #B31F7E; }
+
+    /* Modal overlay */
+    .gr-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 30px 20px; }
+    .gr-modal-overlay.open { display: flex; }
+    .gr-modal-box { background: #fff; border-radius: 16px; box-shadow: 0 12px 48px rgba(0,0,0,0.22); padding: 32px 36px; width: 100%; max-width: 700px; }
+    .gr-modal-title { font-size: 1.05rem; font-weight: 700; color: #482A7A; margin-bottom: 18px; }
+    .gr-form-group { margin-bottom: 14px; }
+    .gr-form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: #482A7A; margin-bottom: 5px; }
+    .gr-form-group input[type="text"], .gr-form-group textarea { width: 100%; padding: 9px 12px; border: 1.5px solid #c8cedc; border-radius: 7px; font-size: 0.88rem; font-family: inherit; outline: none; }
+    .gr-form-group input:focus, .gr-form-group textarea:focus { border-color: #482A7A; }
+    .gr-alert { padding: 10px 14px; border-radius: 8px; font-size: 0.84rem; font-weight: 600; margin-bottom: 14px; display: none; }
+    .gr-alert.err { background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; display: block; }
+    .gr-alert.ok  { background: #E8F8EB; color: #1e7a3a; border: 1px solid #a3d9a5; display: block; }
+    .gr-section-title { font-size: 0.97rem; font-weight: 700; color: #482A7A; margin: 18px 0 10px; }
+    .gr-review-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 14px; }
+    .gr-review-table th { background: #EDE5F5; color: #482A7A; font-weight: 700; padding: 8px 12px; text-align: left; }
+    .gr-review-table td { padding: 8px 12px; border-bottom: 1px solid #eaecf2; }
+    .gr-review-table tr:last-child td { border-bottom: none; }
   </style>
 </head>
 <body>
@@ -308,6 +361,11 @@
       </div>
     </div>
     <div class="header-tool-name">Enterprise Data Management Tool</div>
+    <div id="header-user-info" style="display:flex;align-items:center;gap:10px;margin-left:auto;">
+      <span id="header-user-name" style="font-size:0.82rem;font-weight:600;color:#fff;"></span>
+      <span id="header-user-role" style="font-size:0.7rem;background:rgba(255,255,255,0.18);border-radius:12px;padding:3px 10px;color:#fff;"></span>
+      <button onclick="logout()" class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.4);">Logout</button>
+    </div>
   </div>
 </header>
 
@@ -315,6 +373,8 @@
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('dama', this)">DAMA Maturity Assessment</button>
     <button class="tab-btn" onclick="switchTab('dq', this)">Data Quality Assessment</button>
+    <button class="tab-btn" id="tab-btn-golden" onclick="switchTab('golden', this)">Golden Records</button>
+    <button class="tab-btn" id="tab-btn-users" onclick="switchTab('users', this)" style="display:none;">User Management</button>
   </div>
 
   <!-- ═══════════════════════ DAMA PANEL ═══════════════════════ -->
@@ -630,6 +690,269 @@
       </div>
     </div>
   </div>
+
+  <!-- ═══════════════════════ USER MANAGEMENT PANEL ═══════════════════════ -->
+  <div class="tab-panel" id="panel-users" style="background:#fff;border-radius:0 0 16px 16px;box-shadow:0 4px 20px rgba(72,42,122,0.12);min-height:600px;padding:26px 30px;">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2 style="font-size:1.12rem;font-weight:700;color:#482A7A;margin-bottom:3px;">User Management</h2>
+        <p style="font-size:0.82rem;color:#667;">Invite users, manage roles and client/master access.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openInviteModal()">+ Invite User</button>
+    </div>
+
+    <!-- Alert -->
+    <div id="users-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.84rem;font-weight:600;margin-bottom:16px;"></div>
+
+    <!-- Users Table -->
+    <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:10px;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.83rem;" id="users-table">
+        <thead>
+          <tr style="background:linear-gradient(90deg,#482A7A,#B31F7E);">
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Name</th>
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Email</th>
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Role</th>
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Status</th>
+            <th style="padding:10px 13px;text-align:left;color:#fff;font-size:0.8rem;white-space:nowrap;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody">
+          <tr><td colspan="5" style="padding:40px;text-align:center;color:#8a94a8;">Loading users…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Access sub-panel (appears below table when expanded) -->
+    <div id="access-panel" style="display:none;margin-top:22px;background:#F7F5F9;border:1px solid #e2e6f0;border-radius:10px;padding:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <h3 id="access-panel-title" style="font-size:0.95rem;font-weight:700;color:#482A7A;"></h3>
+        <button class="btn btn-outline btn-sm" onclick="closeAccessPanel()">Close</button>
+      </div>
+      <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:8px;background:#fff;margin-bottom:14px;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;" id="access-table">
+          <thead>
+            <tr style="background:#EDE5F5;">
+              <th style="padding:8px 12px;text-align:left;color:#482A7A;font-weight:700;">Client Name</th>
+              <th style="padding:8px 12px;text-align:left;color:#482A7A;font-weight:700;">Master Name</th>
+              <th style="padding:8px 12px;text-align:left;color:#482A7A;font-weight:700;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="access-tbody"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div>
+          <label style="font-size:0.8rem;font-weight:600;color:#482A7A;display:block;margin-bottom:4px;">Client Name</label>
+          <input type="text" id="access-client" placeholder="e.g. Acme Corp" style="padding:7px 10px;border:1.5px solid #c8cedc;border-radius:6px;font-size:0.86rem;font-family:inherit;outline:none;width:180px;" />
+        </div>
+        <div>
+          <label style="font-size:0.8rem;font-weight:600;color:#482A7A;display:block;margin-bottom:4px;">Master Name (optional)</label>
+          <input type="text" id="access-master" placeholder="* = all masters" style="padding:7px 10px;border:1.5px solid #c8cedc;border-radius:6px;font-size:0.86rem;font-family:inherit;outline:none;width:180px;" />
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="grantAccess()">Grant Access</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ GOLDEN RECORDS PANEL ═══════════════════════ -->
+  <div class="tab-panel" id="panel-golden">
+
+    <!-- Cases List View -->
+    <div id="gr-list-view">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h2 style="font-size:1.12rem;font-weight:700;color:#482A7A;margin-bottom:3px;">Golden Record Cases</h2>
+          <p style="font-size:0.82rem;color:#667;">Upload duplicates, propose a golden record, and get it approved.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;" id="gr-action-btns">
+          <button class="btn btn-outline btn-sm" id="gr-download-btn" onclick="bulkDownloadGR()" title="Download your open/rejected cases as an Excel workbook to fill offline">&#11015; Download Workbook</button>
+          <label class="btn btn-outline btn-sm" id="gr-upload-btn" style="cursor:pointer;" title="Upload the filled workbook to submit proposals in bulk">&#11014; Upload Proposals<input type="file" id="gr-bulk-upload-input" accept=".xlsx,.xls,.csv" style="display:none;" onchange="grHandleBulkUpload(this)" /></label>
+          <button class="btn btn-primary btn-sm" id="gr-new-case-btn" onclick="openGRModal()">+ New Case</button>
+        </div>
+      </div>
+      <div id="gr-list-alert" class="gr-alert"></div>
+
+      <!-- Bulk upload preview (shown after parsing uploaded workbook) -->
+      <div id="gr-bulk-preview" style="display:none;background:#F7F5F9;border:1px solid #e2e6f0;border-radius:10px;padding:18px;margin-bottom:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-size:0.95rem;font-weight:700;color:#482A7A;" id="gr-bulk-preview-title"></div>
+          <button class="btn btn-outline btn-sm" onclick="cancelBulkPreview()">Cancel</button>
+        </div>
+        <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:8px;background:#fff;margin-bottom:14px;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.8rem;" id="gr-bulk-preview-table">
+            <thead><tr style="background:linear-gradient(90deg,#482A7A,#B31F7E);">
+              <th style="padding:8px 12px;text-align:left;color:#fff;font-weight:700;">Case</th>
+              <th style="padding:8px 12px;text-align:left;color:#fff;font-weight:700;">Fields</th>
+              <th style="padding:8px 12px;text-align:left;color:#fff;font-weight:700;">Status</th>
+            </tr></thead>
+            <tbody id="gr-bulk-preview-tbody"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-primary" id="gr-bulk-submit-btn" onclick="submitBulkProposals()">Submit All Proposals</button>
+      </div>
+      <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:10px;">
+        <table class="gr-table" id="gr-cases-table">
+          <thead>
+            <tr>
+              <th>Case Name</th>
+              <th>Entity Type</th>
+              <th>Records</th>
+              <th>Status</th>
+              <th>Created By</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="gr-cases-tbody">
+            <tr><td colspan="7" style="padding:40px;text-align:center;color:#8a94a8;">Loading cases…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Case Detail View -->
+    <div id="gr-detail-view" style="display:none;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
+        <button class="btn btn-outline btn-sm" onclick="showGRList()">&#8592; Back to Cases</button>
+        <div>
+          <span id="gr-detail-name" style="font-size:1.1rem;font-weight:700;color:#482A7A;"></span>
+          <span id="gr-detail-entity" style="font-size:0.82rem;color:#667;margin-left:8px;"></span>
+          <span id="gr-detail-status-badge" class="gr-status-badge" style="margin-left:8px;"></span>
+        </div>
+        <span id="gr-detail-meta" style="font-size:0.78rem;color:#8a94a8;margin-left:auto;"></span>
+      </div>
+      <div id="gr-detail-alert" class="gr-alert"></div>
+
+      <!-- Records table -->
+      <div class="gr-section-title">Source Records</div>
+      <div class="gr-records-table-wrap" id="gr-records-wrap"></div>
+
+      <!-- Propose panel (maker/admin on open cases) -->
+      <div id="gr-propose-panel" style="display:none;">
+        <div class="gr-section-title">Propose Golden Record</div>
+        <p style="font-size:0.82rem;color:#667;margin-bottom:14px;">Select the best value for each field. Click a chip to choose it, or type a custom override.</p>
+        <div id="gr-field-selector"></div>
+        <div class="gr-form-group" style="margin-top:14px;">
+          <label>Notes (optional)</label>
+          <textarea id="gr-proposal-notes" rows="3" placeholder="Any notes for the checker…"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="submitGRProposal()">Submit Proposal</button>
+      </div>
+
+      <!-- Review panel (checker/admin on proposed cases) -->
+      <div id="gr-review-panel" style="display:none;">
+        <div class="gr-section-title">Review Golden Record Proposal</div>
+        <table class="gr-review-table" id="gr-golden-preview"></table>
+        <p id="gr-proposal-notes-display" style="font-size:0.82rem;color:#667;margin-bottom:14px;"></p>
+        <div class="gr-form-group">
+          <label>Review Notes</label>
+          <textarea id="gr-review-notes" rows="3" placeholder="Reason for approval or rejection…"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="reviewGRProposal('approved')">Approve</button>
+          <button class="btn btn-outline" style="color:#c0392b;border-color:#c0392b;" onclick="reviewGRProposal('rejected')">Reject</button>
+        </div>
+      </div>
+
+      <!-- Approved: show golden record + export -->
+      <div id="gr-approved-panel" style="display:none;">
+        <div class="gr-section-title">Approved Golden Record</div>
+        <table class="gr-review-table" id="gr-approved-preview"></table>
+        <div id="gr-approved-review-notes" style="font-size:0.82rem;color:#667;margin:10px 0 14px;"></div>
+        <button class="btn btn-success" onclick="exportGoldenCSV()">&#11015; Export as CSV</button>
+      </div>
+
+      <!-- Rejected: show notes -->
+      <div id="gr-rejected-panel" style="display:none;">
+        <div class="gr-section-title">Proposal Rejected</div>
+        <div id="gr-rejected-notes" style="background:#fdecea;border:1px solid #f5c6cb;border-radius:8px;padding:12px 16px;font-size:0.84rem;color:#c0392b;margin-bottom:14px;"></div>
+        <button class="btn btn-primary" onclick="resubmitProposal()">Revise &amp; Resubmit</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── New Case Modal ─── -->
+<div id="gr-modal" class="gr-modal-overlay">
+  <div class="gr-modal-box">
+    <div class="gr-modal-title">Bulk Upload — Create Cases from File</div>
+    <div id="gr-modal-alert" class="gr-alert"></div>
+
+    <div class="gr-form-group">
+      <label>Entity Type</label>
+      <input type="text" id="gr-entity-type" placeholder="Customer" value="Customer" />
+    </div>
+
+    <div class="gr-form-group">
+      <label>Upload CSV or Excel file</label>
+      <div class="drop-zone" id="gr-drop-zone" onclick="document.getElementById('gr-file-input').click()" style="padding:28px 20px;">
+        <div class="drop-zone-icon">&#128196;</div>
+        <h3>Click to select a file</h3>
+        <p>CSV (.csv) or Excel (.xlsx, .xls) &mdash; first row must be column headers.</p>
+      </div>
+      <input type="file" id="gr-file-input" accept=".csv,.xlsx,.xls" style="display:none;" onchange="grHandleFile(this)" />
+    </div>
+
+    <!-- Column selector (shown after file parsed) -->
+    <div id="gr-col-selector" style="display:none;">
+      <div class="gr-form-group">
+        <label>Group ID Column <span style="font-weight:400;color:#667;">— which column identifies the duplicate group?</span></label>
+        <select id="gr-group-col" onchange="grUpdateGroupPreview()" style="width:100%;padding:9px 12px;border:1.5px solid #c8cedc;border-radius:7px;font-size:0.88rem;font-family:inherit;outline:none;background:#fff;">
+          <option value="">-- select a column --</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Group summary table (shown after column selected) -->
+    <div id="gr-group-summary" style="display:none;background:#F7F5F9;border:1px solid #e2e6f0;border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+      <div id="gr-group-summary-text" style="font-size:0.86rem;font-weight:600;color:#482A7A;margin-bottom:8px;"></div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.79rem;">
+          <thead><tr style="background:#EDE5F5;">
+            <th style="padding:6px 10px;text-align:left;color:#482A7A;font-weight:700;">Group</th>
+            <th style="padding:6px 10px;text-align:left;color:#482A7A;font-weight:700;">Case Name</th>
+            <th style="padding:6px 10px;text-align:right;color:#482A7A;font-weight:700;">Records</th>
+          </tr></thead>
+          <tbody id="gr-group-preview-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:18px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeGRModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1;" id="gr-modal-submit" onclick="submitNewCase()" disabled>Create Cases</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Invite User Modal ─── -->
+<div id="invite-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,0.22);padding:36px 40px;width:100%;max-width:420px;margin:20px;">
+    <h3 style="font-size:1.05rem;font-weight:700;color:#482A7A;margin-bottom:18px;">Invite New User</h3>
+    <div id="invite-alert" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.84rem;font-weight:600;margin-bottom:14px;background:#fdecea;color:#c0392b;border:1px solid #f5c6cb;"></div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;color:#482A7A;margin-bottom:5px;">Email address</label>
+      <input type="email" id="invite-email" placeholder="user@company.com" style="width:100%;padding:9px 12px;border:1.5px solid #c8cedc;border-radius:7px;font-size:0.88rem;font-family:inherit;outline:none;" />
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;color:#482A7A;margin-bottom:5px;">Full name</label>
+      <input type="text" id="invite-name" placeholder="User's full name" style="width:100%;padding:9px 12px;border:1.5px solid #c8cedc;border-radius:7px;font-size:0.88rem;font-family:inherit;outline:none;" />
+    </div>
+    <div style="margin-bottom:22px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;color:#482A7A;margin-bottom:5px;">Role</label>
+      <select id="invite-role" style="width:100%;padding:9px 12px;border:1.5px solid #c8cedc;border-radius:7px;font-size:0.88rem;font-family:inherit;outline:none;background:#fff;">
+        <option value="maker">Maker</option>
+        <option value="checker">Checker</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeInviteModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1;" id="invite-submit-btn" onclick="doInviteUser()">Send Invite</button>
+    </div>
+  </div>
 </div>
 
 <footer class="site-footer">
@@ -645,6 +968,248 @@
 'use strict';
 
 /* ============================================================
+   AUTH GUARD
+============================================================ */
+(function() {
+  const token = localStorage.getItem('edm_token');
+  if (!token) { window.location.href = 'login.html'; return; }
+  fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } })
+    .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+    .then(({ user }) => {
+      window.EDM_USER = user;
+      document.getElementById('header-user-name').textContent = user.name;
+      document.getElementById('header-user-role').textContent = user.role.toUpperCase();
+      if (user.role === 'admin') {
+        document.getElementById('tab-btn-users').style.display = '';
+      }
+    })
+    .catch(() => { localStorage.clear(); window.location.href = 'login.html'; });
+})();
+
+/* ============================================================
+   AUTH: LOGOUT
+============================================================ */
+function logout() {
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
+
+/* ============================================================
+   USER MANAGEMENT
+============================================================ */
+let _currentAccessUserId = null;
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', Authorization: 'Bearer ' + localStorage.getItem('edm_token') };
+}
+
+function showUsersAlert(msg, isError) {
+  const el = document.getElementById('users-alert');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = isError ? '#fdecea' : '#E8F8EB';
+  el.style.color = isError ? '#c0392b' : '#1e7a3a';
+  el.style.border = '1px solid ' + (isError ? '#f5c6cb' : '#a3d9a5');
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+async function loadUsers() {
+  try {
+    const res = await fetch('/api/users', { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    const { users } = await res.json();
+    renderUsersTable(users);
+  } catch {
+    document.getElementById('users-tbody').innerHTML =
+      '<tr><td colspan="5" style="padding:30px;text-align:center;color:#e74c3c;">Failed to load users.</td></tr>';
+  }
+}
+
+function renderUsersTable(users) {
+  const tbody = document.getElementById('users-tbody');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:30px;text-align:center;color:#8a94a8;">No users found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map(u => {
+    const statusBadge = u.is_active
+      ? '<span style="display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.74rem;font-weight:700;background:#E8F8EB;color:#1e7a3a;">Active</span>'
+      : '<span style="display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.74rem;font-weight:700;background:#fdecea;color:#c0392b;">Inactive</span>';
+    const roleBadge = `<span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:0.74rem;font-weight:700;background:#EDE5F5;color:#482A7A;">${u.role}</span>`;
+    const isSelf = window.EDM_USER && u.id === window.EDM_USER.id;
+    return `<tr style="${u.id % 2 === 0 ? 'background:#F7F5F9;' : ''}">
+      <td style="padding:9px 13px;font-weight:600;">${escHtml(u.name)}</td>
+      <td style="padding:9px 13px;">${escHtml(u.email)}</td>
+      <td style="padding:9px 13px;">
+        <select onchange="changeRole(${u.id}, this.value)" style="border:1px solid #c8cedc;border-radius:6px;padding:4px 8px;font-size:0.8rem;font-family:inherit;${isSelf ? 'opacity:0.5;pointer-events:none;' : ''}">
+          <option value="maker" ${u.role==='maker'?'selected':''}>Maker</option>
+          <option value="checker" ${u.role==='checker'?'selected':''}>Checker</option>
+          <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+        </select>
+      </td>
+      <td style="padding:9px 13px;">${statusBadge}</td>
+      <td style="padding:9px 13px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="toggleActive(${u.id}, ${!u.is_active})"${isSelf?' disabled title="Cannot deactivate yourself"':''}>${u.is_active ? 'Deactivate' : 'Activate'}</button>
+          <button class="btn btn-outline btn-sm" onclick="openAccessPanel(${u.id}, '${escHtml(u.name)}')">Access</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function changeRole(userId, role) {
+  try {
+    const res = await fetch('/api/users/' + userId + '/role', {
+      method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ role }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    showUsersAlert('Role updated.', false);
+    loadUsers();
+  } catch (e) {
+    showUsersAlert(e.message || 'Failed to update role.', true);
+    loadUsers();
+  }
+}
+
+async function toggleActive(userId, activate) {
+  try {
+    const res = await fetch('/api/users/' + userId + '/active', {
+      method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ is_active: activate }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    showUsersAlert(activate ? 'User activated.' : 'User deactivated.', false);
+    loadUsers();
+  } catch (e) {
+    showUsersAlert(e.message || 'Failed to update status.', true);
+  }
+}
+
+/* Invite modal */
+function openInviteModal() {
+  document.getElementById('invite-email').value = '';
+  document.getElementById('invite-name').value = '';
+  document.getElementById('invite-role').value = 'maker';
+  document.getElementById('invite-alert').style.display = 'none';
+  document.getElementById('invite-modal').style.display = 'flex';
+}
+function closeInviteModal() {
+  document.getElementById('invite-modal').style.display = 'none';
+}
+
+async function doInviteUser() {
+  const email = document.getElementById('invite-email').value.trim();
+  const name = document.getElementById('invite-name').value.trim();
+  const role = document.getElementById('invite-role').value;
+
+  const alertEl = document.getElementById('invite-alert');
+  alertEl.style.display = 'none';
+
+  if (!email || !name) {
+    alertEl.textContent = 'Email and name are required.';
+    alertEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('invite-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const res = await fetch('/api/users/invite', {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify({ email, name, role }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alertEl.textContent = data.error || 'Invite failed.';
+      alertEl.style.display = 'block';
+    } else {
+      closeInviteModal();
+      showUsersAlert('Invitation sent to ' + email, false);
+      loadUsers();
+    }
+  } catch {
+    alertEl.textContent = 'Network error — please try again.';
+    alertEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send Invite';
+  }
+}
+
+/* Access panel */
+async function openAccessPanel(userId, userName) {
+  _currentAccessUserId = userId;
+  document.getElementById('access-panel-title').textContent = 'Client / Master Access — ' + userName;
+  document.getElementById('access-client').value = '';
+  document.getElementById('access-master').value = '';
+  document.getElementById('access-panel').style.display = 'block';
+  await refreshAccessTable();
+}
+
+function closeAccessPanel() {
+  document.getElementById('access-panel').style.display = 'none';
+  _currentAccessUserId = null;
+}
+
+async function refreshAccessTable() {
+  const tbody = document.getElementById('access-tbody');
+  tbody.innerHTML = '<tr><td colspan="3" style="padding:14px;text-align:center;color:#8a94a8;">Loading…</td></tr>';
+  try {
+    const res = await fetch('/api/users/' + _currentAccessUserId + '/access', { headers: authHeaders() });
+    const { access } = await res.json();
+    if (!access.length) {
+      tbody.innerHTML = '<tr><td colspan="3" style="padding:14px;text-align:center;color:#8a94a8;">No access records yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = access.map(a =>
+      `<tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #eaecf2;">${escHtml(a.client_name)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #eaecf2;">${escHtml(a.master_name)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #eaecf2;">
+          <button class="btn btn-outline btn-sm" style="color:#e74c3c;border-color:#e74c3c;" onclick="revokeAccess(${a.id})">Revoke</button>
+        </td>
+      </tr>`
+    ).join('');
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="3" style="padding:14px;text-align:center;color:#e74c3c;">Failed to load access.</td></tr>';
+  }
+}
+
+async function grantAccess() {
+  const client = document.getElementById('access-client').value.trim();
+  const master = document.getElementById('access-master').value.trim() || '*';
+  if (!client) { alert('Client name is required.'); return; }
+  try {
+    const res = await fetch('/api/users/' + _currentAccessUserId + '/access', {
+      method: 'POST', headers: authHeaders(), body: JSON.stringify({ client_name: client, master_name: master }),
+    });
+    if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+    document.getElementById('access-client').value = '';
+    document.getElementById('access-master').value = '';
+    await refreshAccessTable();
+  } catch (e) {
+    alert(e.message || 'Failed to grant access.');
+  }
+}
+
+async function revokeAccess(accessId) {
+  if (!confirm('Revoke this access record?')) return;
+  try {
+    await fetch('/api/users/' + _currentAccessUserId + '/access/' + accessId, {
+      method: 'DELETE', headers: authHeaders(),
+    });
+    await refreshAccessTable();
+  } catch {
+    alert('Failed to revoke access.');
+  }
+}
+
+/* ============================================================
    SHARED: TAB SWITCHING
 ============================================================ */
 function switchTab(tabId, btn) {
@@ -652,6 +1217,8 @@ function switchTab(tabId, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + tabId).classList.add('active');
   btn.classList.add('active');
+  if (tabId === 'users') loadUsers();
+  if (tabId === 'golden') loadGRCases();
 }
 
 /* ============================================================
@@ -2332,6 +2899,653 @@ function resetDQ() {
   document.getElementById('col-list').innerHTML = '';
   renderRulesList();
   showStep(1);
+}
+
+/* ============================================================
+   GOLDEN RECORDS MODULE
+============================================================ */
+let _grCurrentCase = null;
+let _grParsedHeaders = [];
+let _grAllRows = [];        // all parsed row objects {col: val, ...}
+let _grFileName = '';       // file base name (no extension)
+let _grSelectedValues = {}; // {fieldName: value} — used in detail propose panel
+
+function grStatusBadge(status) {
+  const cls = { open:'gr-status-open', proposed:'gr-status-proposed', approved:'gr-status-approved', rejected:'gr-status-rejected' }[status] || 'gr-status-open';
+  return `<span class="gr-status-badge ${cls}">${escHtml(status)}</span>`;
+}
+
+// ── List view
+async function loadGRCases() {
+  try {
+    const res = await fetch('/api/cases', { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    const { cases } = await res.json();
+    renderGRCases(cases);
+  } catch {
+    document.getElementById('gr-cases-tbody').innerHTML =
+      '<tr><td colspan="7" style="padding:30px;text-align:center;color:#e74c3c;">Failed to load cases.</td></tr>';
+  }
+  // Show/hide maker-only controls based on role
+  const role = window.EDM_USER ? window.EDM_USER.role : '';
+  const isMakerOrAdmin = role === 'admin' || role === 'maker';
+  document.getElementById('gr-new-case-btn').style.display = isMakerOrAdmin ? '' : 'none';
+  document.getElementById('gr-download-btn').style.display = isMakerOrAdmin ? '' : 'none';
+  document.getElementById('gr-upload-btn').style.display = isMakerOrAdmin ? '' : 'none';
+}
+
+function renderGRCases(cases) {
+  const tbody = document.getElementById('gr-cases-tbody');
+  if (!cases.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="padding:30px;text-align:center;color:#8a94a8;">No cases yet. Create one to get started.</td></tr>';
+    return;
+  }
+  const role = window.EDM_USER ? window.EDM_USER.role : '';
+  tbody.innerHTML = cases.map((c, i) => {
+    const isEven = i % 2 === 0;
+    const deleteBtn = role === 'admin'
+      ? `<button class="btn btn-sm" style="background:#fdecea;color:#c0392b;margin-left:6px;" onclick="deleteGRCase(${c.id})">Delete</button>` : '';
+    return `<tr style="${isEven ? 'background:#F7F5F9;' : ''}">
+      <td style="font-weight:600;">${escHtml(c.name)}</td>
+      <td>${escHtml(c.entity_type)}</td>
+      <td>${c.record_count}</td>
+      <td>${grStatusBadge(c.status)}</td>
+      <td>${escHtml(c.created_by_name || '—')}</td>
+      <td>${new Date(c.created_at).toLocaleDateString()}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="openGRCase(${c.id})">View</button>
+        ${deleteBtn}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function showGRList() {
+  document.getElementById('gr-list-view').style.display = '';
+  document.getElementById('gr-detail-view').style.display = 'none';
+  _grCurrentCase = null;
+  loadGRCases();
+}
+
+// ── Case Detail
+async function openGRCase(id) {
+  try {
+    const res = await fetch(`/api/cases/${id}`, { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    const { case: gr } = await res.json();
+    _grCurrentCase = gr;
+    renderGRDetail(gr);
+  } catch {
+    grListAlert('Failed to load case.', true);
+  }
+}
+
+function renderGRDetail(gr) {
+  document.getElementById('gr-list-view').style.display = 'none';
+  document.getElementById('gr-detail-view').style.display = '';
+
+  document.getElementById('gr-detail-name').textContent = gr.name;
+  document.getElementById('gr-detail-entity').textContent = '(' + gr.entity_type + ')';
+  const badge = document.getElementById('gr-detail-status-badge');
+  badge.textContent = gr.status;
+  badge.className = 'gr-status-badge ' + ({ open:'gr-status-open', proposed:'gr-status-proposed', approved:'gr-status-approved', rejected:'gr-status-rejected' }[gr.status] || 'gr-status-open');
+  document.getElementById('gr-detail-meta').textContent = 'Created by ' + (gr.created_by_name || '—') + ' on ' + new Date(gr.created_at).toLocaleDateString();
+
+  // Clear panels and reset any previously mutated inner elements
+  ['gr-propose-panel','gr-review-panel','gr-approved-panel','gr-rejected-panel'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.querySelectorAll('#gr-review-panel .btn').forEach(b => b.style.display = '');
+  document.getElementById('gr-review-notes').style.display = '';
+  clearGRAlert('gr-detail-alert');
+
+  // Records table
+  renderGRRecordsTable(gr.records);
+
+  const role = window.EDM_USER ? window.EDM_USER.role : '';
+
+  if (gr.status === 'open' && (role === 'admin' || role === 'maker')) {
+    renderGRFieldSelector(gr.records);
+    document.getElementById('gr-proposal-notes').value = '';
+    document.getElementById('gr-propose-panel').style.display = '';
+  } else if (gr.status === 'proposed' && (role === 'admin' || role === 'checker')) {
+    renderGRGoldenPreview('gr-golden-preview', gr.proposal.golden_data);
+    const notesDisplay = document.getElementById('gr-proposal-notes-display');
+    notesDisplay.textContent = gr.proposal.notes ? 'Notes: ' + gr.proposal.notes : '';
+    document.getElementById('gr-review-notes').value = '';
+    document.getElementById('gr-review-panel').style.display = '';
+  } else if (gr.status === 'proposed' && (role === 'maker')) {
+    // maker seeing proposed — show read-only golden preview
+    renderGRGoldenPreview('gr-golden-preview', gr.proposal.golden_data);
+    const notesDisplay = document.getElementById('gr-proposal-notes-display');
+    notesDisplay.textContent = gr.proposal.notes ? 'Notes: ' + gr.proposal.notes : '';
+    document.getElementById('gr-review-panel').style.display = '';
+    // hide approve/reject buttons for maker
+    document.querySelectorAll('#gr-review-panel .btn').forEach(b => b.style.display = 'none');
+    document.getElementById('gr-review-notes').style.display = 'none';
+  } else if (gr.status === 'approved') {
+    renderGRGoldenPreview('gr-approved-preview', gr.proposal.golden_data);
+    const reviewedBy = gr.proposal.reviewed_by_name || '—';
+    const reviewNotes = gr.proposal.review_notes || '';
+    document.getElementById('gr-approved-review-notes').textContent =
+      `Approved by ${reviewedBy}` + (reviewNotes ? ' — ' + reviewNotes : '');
+    document.getElementById('gr-approved-panel').style.display = '';
+  } else if (gr.status === 'rejected') {
+    const notes = gr.proposal ? (gr.proposal.review_notes || 'No notes provided.') : 'No notes provided.';
+    document.getElementById('gr-rejected-notes').textContent = notes;
+    document.getElementById('gr-rejected-panel').style.display = '';
+    // Only maker/admin can resubmit
+    if (role !== 'admin' && role !== 'maker') {
+      document.querySelector('#gr-rejected-panel .btn').style.display = 'none';
+    }
+  }
+}
+
+function renderGRRecordsTable(records) {
+  const wrap = document.getElementById('gr-records-wrap');
+  if (!records || records.length === 0) { wrap.innerHTML = '<p style="padding:14px;color:#8a94a8;">No records.</p>'; return; }
+  const headers = Object.keys(records[0].data);
+  const thead = `<tr><th class="source-header">Field</th>${records.map(r => `<th class="source-header">${escHtml(r.source_name)}</th>`).join('')}</tr>`;
+  const rows = headers.map(h => {
+    const cells = records.map(r => `<td>${escHtml(String(r.data[h] != null ? r.data[h] : ''))}</td>`).join('');
+    return `<tr><td style="font-weight:600;color:#482A7A;">${escHtml(h)}</td>${cells}</tr>`;
+  }).join('');
+  wrap.innerHTML = `<table class="gr-records-table"><thead>${thead}</thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderGRFieldSelector(records) {
+  if (!records || records.length === 0) return;
+  const headers = Object.keys(records[0].data);
+  _grSelectedValues = {};
+  const container = document.getElementById('gr-field-selector');
+  container.innerHTML = headers.map(field => {
+    const chips = records.map((r, i) => {
+      const val = r.data[field] != null ? String(r.data[field]) : '';
+      return `<span class="gr-chip" data-field="${escHtml(field)}" data-val="${escHtml(val)}" onclick="selectGRChip(this)">
+        <span class="gr-chip-label">${escHtml(r.source_name)}:</span>${escHtml(val) || '<em style="opacity:0.5">empty</em>'}
+      </span>`;
+    }).join('');
+    return `<div class="gr-field-row">
+      <div class="gr-field-label">${escHtml(field)}</div>
+      <div class="gr-chips" id="chips-${escHtml(field)}">${chips}</div>
+      <input type="text" class="gr-override-input" placeholder="Override (optional)" id="override-${escHtml(field)}"
+        oninput="selectGROverride(this,'${escHtml(field)}')" />
+    </div>`;
+  }).join('');
+}
+
+function selectGRChip(el) {
+  const field = el.dataset.field;
+  const val = el.dataset.val;
+  // Deselect other chips in same field
+  document.querySelectorAll(`.gr-chip[data-field="${field}"]`).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  _grSelectedValues[field] = val;
+  // Clear override
+  const overrideEl = document.getElementById('override-' + field);
+  if (overrideEl) overrideEl.value = '';
+}
+
+function selectGROverride(input, field) {
+  const val = input.value;
+  document.querySelectorAll(`.gr-chip[data-field="${field}"]`).forEach(c => c.classList.remove('selected'));
+  _grSelectedValues[field] = val;
+}
+
+async function submitGRProposal() {
+  if (!_grCurrentCase) return;
+  const gr = _grCurrentCase;
+  const headers = gr.records.length ? Object.keys(gr.records[0].data) : [];
+  const golden_data = {};
+  for (const h of headers) {
+    golden_data[h] = _grSelectedValues[h] !== undefined ? _grSelectedValues[h] : '';
+  }
+  const notes = document.getElementById('gr-proposal-notes').value.trim();
+  try {
+    const res = await fetch(`/api/cases/${gr.id}/proposal`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ golden_data, notes }),
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Error'); }
+    grDetailAlert('Proposal submitted! The case is now pending review.', false);
+    const refreshed = await fetch(`/api/cases/${gr.id}`, { headers: authHeaders() });
+    const { case: updated } = await refreshed.json();
+    _grCurrentCase = updated;
+    renderGRDetail(updated);
+  } catch (e) {
+    grDetailAlert(e.message, true);
+  }
+}
+
+function renderGRGoldenPreview(tableId, goldenData) {
+  const table = document.getElementById(tableId);
+  if (!goldenData) { table.innerHTML = ''; return; }
+  const rows = Object.entries(goldenData).map(([k, v]) =>
+    `<tr><th style="background:#EDE5F5;color:#482A7A;font-weight:700;padding:8px 12px;text-align:left;">${escHtml(k)}</th>
+     <td style="padding:8px 12px;border-bottom:1px solid #eaecf2;">${escHtml(String(v != null ? v : ''))}</td></tr>`
+  ).join('');
+  table.innerHTML = `<tbody>${rows}</tbody>`;
+}
+
+async function reviewGRProposal(status) {
+  if (!_grCurrentCase) return;
+  const review_notes = document.getElementById('gr-review-notes').value.trim();
+  try {
+    const res = await fetch(`/api/cases/${_grCurrentCase.id}/proposal`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ status, review_notes }),
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Error'); }
+    grDetailAlert(`Proposal ${status}.`, false);
+    const refreshed = await fetch(`/api/cases/${_grCurrentCase.id}`, { headers: authHeaders() });
+    const { case: updated } = await refreshed.json();
+    _grCurrentCase = updated;
+    renderGRDetail(updated);
+  } catch (e) {
+    grDetailAlert(e.message, true);
+  }
+}
+
+async function exportGoldenCSV() {
+  if (!_grCurrentCase) return;
+  try {
+    const res = await fetch(`/api/cases/${_grCurrentCase.id}/export`, { headers: authHeaders() });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Error'); }
+    const { golden_data, name } = await res.json();
+    const headers = Object.keys(golden_data);
+    const values = headers.map(h => {
+      const v = String(golden_data[h] != null ? golden_data[h] : '');
+      return v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+    });
+    const csv = headers.join(',') + '\n' + values.join(',');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (name || 'golden_record').replace(/[^a-z0-9_\-]/gi, '_') + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    grDetailAlert(e.message, true);
+  }
+}
+
+async function deleteGRCase(id) {
+  if (!confirm('Delete this case? This cannot be undone.')) return;
+  try {
+    const res = await fetch(`/api/cases/${id}`, { method: 'DELETE', headers: authHeaders() });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Error'); }
+    loadGRCases();
+  } catch (e) {
+    grListAlert(e.message, true);
+  }
+}
+
+function resubmitProposal() {
+  if (!_grCurrentCase) return;
+  // Re-render field selector (re-open propose panel)
+  renderGRFieldSelector(_grCurrentCase.records);
+  document.getElementById('gr-proposal-notes').value = '';
+  document.getElementById('gr-rejected-panel').style.display = 'none';
+  document.getElementById('gr-propose-panel').style.display = '';
+  // Update status badge to show open state visually
+  const badge = document.getElementById('gr-detail-status-badge');
+  badge.textContent = 'revising';
+  badge.className = 'gr-status-badge gr-status-open';
+}
+
+// ── Modal
+function openGRModal() {
+  _grParsedHeaders = [];
+  _grAllRows = [];
+  _grFileName = '';
+  document.getElementById('gr-entity-type').value = 'Customer';
+  document.getElementById('gr-file-input').value = '';
+  document.getElementById('gr-col-selector').style.display = 'none';
+  document.getElementById('gr-group-summary').style.display = 'none';
+  document.getElementById('gr-modal-submit').disabled = true;
+  document.getElementById('gr-modal-submit').textContent = 'Create Cases';
+  clearGRAlert('gr-modal-alert');
+  document.getElementById('gr-modal').classList.add('open');
+}
+
+function closeGRModal() {
+  document.getElementById('gr-modal').classList.remove('open');
+}
+
+function grHandleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  _grFileName = file.name.replace(/\.[^.]+$/, '');
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'csv') {
+    const reader = new FileReader();
+    reader.onload = e => parseGRCSV(e.target.result);
+    reader.readAsText(file);
+  } else if (ext === 'xlsx' || ext === 'xls') {
+    const reader = new FileReader();
+    reader.onload = e => parseGRExcel(e.target.result);
+    reader.readAsArrayBuffer(file);
+  } else {
+    grModalAlert('Please upload a .csv, .xlsx, or .xls file.', true);
+  }
+}
+
+function parseGRCSV(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) { grModalAlert('CSV must have at least a header row and one data row.', true); return; }
+  _grParsedHeaders = splitCSVLine(lines[0]);
+  _grAllRows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = splitCSVLine(lines[i]);
+    const row = {};
+    _grParsedHeaders.forEach((h, idx) => { row[h] = vals[idx] !== undefined ? vals[idx] : ''; });
+    _grAllRows.push(row);
+  }
+  grShowColSelector();
+}
+
+function parseGRExcel(arrayBuffer) {
+  try {
+    const wb = XLSX.read(arrayBuffer, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+    if (rows.length === 0) { grModalAlert('Excel sheet appears empty.', true); return; }
+    _grParsedHeaders = Object.keys(rows[0]);
+    _grAllRows = rows.map(r => {
+      const obj = {};
+      _grParsedHeaders.forEach(h => { obj[h] = r[h] !== undefined ? String(r[h]) : ''; });
+      return obj;
+    });
+    grShowColSelector();
+  } catch (e) {
+    grModalAlert('Could not parse Excel file: ' + e.message, true);
+  }
+}
+
+function grShowColSelector() {
+  const sel = document.getElementById('gr-group-col');
+  sel.innerHTML = '<option value="">-- select a column --</option>' +
+    _grParsedHeaders.map(h => `<option value="${escHtml(h)}">${escHtml(h)}</option>`).join('');
+  document.getElementById('gr-col-selector').style.display = '';
+  document.getElementById('gr-group-summary').style.display = 'none';
+  document.getElementById('gr-modal-submit').disabled = true;
+  grModalAlert(`Parsed ${_grAllRows.length} row(s) with ${_grParsedHeaders.length} column(s). Select the Group ID column below.`, false);
+}
+
+function grUpdateGroupPreview() {
+  const groupCol = document.getElementById('gr-group-col').value;
+  if (!groupCol) {
+    document.getElementById('gr-group-summary').style.display = 'none';
+    document.getElementById('gr-modal-submit').disabled = true;
+    return;
+  }
+  const groups = {};
+  _grAllRows.forEach(row => {
+    const gVal = String(row[groupCol] !== undefined ? row[groupCol] : '');
+    if (!groups[gVal]) groups[gVal] = [];
+    groups[gVal].push(row);
+  });
+  const entries = Object.entries(groups);
+  document.getElementById('gr-group-summary-text').textContent =
+    `${entries.length} group(s) found — will create ${entries.length} case(s)`;
+  document.getElementById('gr-group-preview-tbody').innerHTML = entries.map(([gVal, recs]) =>
+    `<tr>
+      <td style="padding:5px 10px;font-weight:600;">${escHtml(gVal)}</td>
+      <td style="padding:5px 10px;color:#667;">${escHtml(_grFileName + ' \u2014 ' + gVal)}</td>
+      <td style="padding:5px 10px;text-align:right;">${recs.length}</td>
+    </tr>`
+  ).join('');
+  document.getElementById('gr-group-summary').style.display = '';
+  const btn = document.getElementById('gr-modal-submit');
+  btn.textContent = `Create ${entries.length} Case${entries.length !== 1 ? 's' : ''}`;
+  btn.disabled = false;
+  clearGRAlert('gr-modal-alert');
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let cur = '', inQuote = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuote && line[i+1] === '"') { cur += '"'; i++; }
+      else { inQuote = !inQuote; }
+    } else if (ch === ',' && !inQuote) {
+      result.push(cur.trim()); cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  result.push(cur.trim());
+  return result;
+}
+
+async function submitNewCase() {
+  const entity_type = document.getElementById('gr-entity-type').value.trim() || 'Generic';
+  const groupCol = document.getElementById('gr-group-col').value;
+  if (!groupCol) { grModalAlert('Please select a Group ID column.', true); return; }
+  if (_grAllRows.length === 0) { grModalAlert('Please upload a file first.', true); return; }
+
+  // Build groups
+  const groups = {};
+  _grAllRows.forEach(row => {
+    const gVal = String(row[groupCol] !== undefined ? row[groupCol] : '');
+    if (!groups[gVal]) groups[gVal] = [];
+    groups[gVal].push(row);
+  });
+  const entries = Object.entries(groups);
+  if (entries.length === 0) { grModalAlert('No groups found.', true); return; }
+
+  const btn = document.getElementById('gr-modal-submit');
+  btn.disabled = true;
+  let created = 0, failed = 0;
+
+  for (const [gVal, rows] of entries) {
+    btn.textContent = `Creating ${created + 1} of ${entries.length}…`;
+    const caseName = _grFileName + ' \u2014 ' + gVal;
+    const records = rows.map((row, i) => ({ source_name: 'Record ' + (i + 1), data: row }));
+    try {
+      const res = await fetch('/api/cases', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ name: caseName, entity_type, records }),
+      });
+      if (res.ok) { created++; } else { failed++; }
+    } catch { failed++; }
+  }
+
+  btn.disabled = false;
+  if (failed === 0) {
+    closeGRModal();
+    loadGRCases();
+  } else {
+    btn.textContent = `Create ${entries.length} Case${entries.length !== 1 ? 's' : ''}`;
+    grModalAlert(`${created} case(s) created, ${failed} failed. Please retry.`, true);
+  }
+}
+
+// ── Bulk Download
+async function bulkDownloadGR() {
+  const btn = document.getElementById('gr-download-btn');
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Downloading…';
+  try {
+    const res = await fetch('/api/cases/bulk-download', { headers: authHeaders() });
+    if (!res.ok) throw new Error((await res.json()).error || 'Error');
+    const { cases } = await res.json();
+    if (cases.length === 0) { grListAlert('No open or rejected cases to download.', true); return; }
+    buildBulkWorkbook(cases);
+  } catch (e) {
+    grListAlert(e.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = orig;
+  }
+}
+
+function buildBulkWorkbook(cases) {
+  // Collect union of all data fields across all cases
+  const allFields = [];
+  const seen = new Set();
+  cases.forEach(c => c.records.forEach(r => {
+    Object.keys(r.data).forEach(k => { if (!seen.has(k)) { seen.add(k); allFields.push(k); } });
+  }));
+
+  const SYS = ['_case_id', '_case_name', '_row_type', '_notes'];
+  const headers = [...SYS, ...allFields];
+  const aoa = [headers]; // array-of-arrays for XLSX
+
+  cases.forEach(c => {
+    // Source rows (read-only reference)
+    c.records.forEach(r => {
+      const row = [c.id, c.name, 'source', ''];
+      allFields.forEach(f => row.push(r.data[f] !== undefined ? r.data[f] : ''));
+      aoa.push(row);
+    });
+    // Golden row — maker fills this in
+    const golden = [c.id, c.name, 'golden', ''];
+    allFields.forEach(() => golden.push(''));
+    aoa.push(golden);
+    // Blank separator for readability
+    aoa.push(new Array(headers.length).fill(''));
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  // Style the header row bold by setting !cols widths (basic)
+  ws['!cols'] = headers.map((h, i) => ({ wch: i < 4 ? 22 : Math.max(14, h.length + 4) }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Golden Records');
+  XLSX.writeFile(wb, 'golden_records_workbook.xlsx');
+  grListAlert(`Downloaded ${cases.length} case(s). Fill the "golden" rows and upload back.`, false);
+}
+
+// ── Bulk Upload Proposals
+let _bulkProposals = []; // parsed proposals waiting for confirmation
+
+function grHandleBulkUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = ''; // reset so same file can be re-uploaded
+  const reader = new FileReader();
+  reader.onload = e => parseBulkWorkbook(e.target.result);
+  reader.readAsArrayBuffer(file);
+}
+
+function parseBulkWorkbook(arrayBuffer) {
+  try {
+    const wb = XLSX.read(arrayBuffer, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+    const goldenRows = rows.filter(r => String(r['_row_type']).trim().toLowerCase() === 'golden');
+    if (goldenRows.length === 0) {
+      grListAlert('No golden rows found. Rows must have "_row_type" = "golden".', true); return;
+    }
+
+    _bulkProposals = goldenRows.map(row => {
+      const case_id = parseInt(row['_case_id'], 10);
+      const case_name = String(row['_case_name'] || '');
+      const notes = String(row['_notes'] || '');
+      const golden_data = {};
+      Object.keys(row).forEach(k => {
+        if (!['_case_id', '_case_name', '_row_type', '_notes'].includes(k)) {
+          const v = String(row[k] !== undefined ? row[k] : '');
+          if (v !== '') golden_data[k] = v; // only include non-empty fields
+        }
+      });
+      return { case_id, case_name, golden_data, notes };
+    }).filter(p => !isNaN(p.case_id));
+
+    if (_bulkProposals.length === 0) {
+      grListAlert('Could not parse any valid golden rows (check _case_id column is numeric).', true); return;
+    }
+    renderBulkPreview(_bulkProposals);
+  } catch (e) {
+    grListAlert('Could not parse file: ' + e.message, true);
+  }
+}
+
+function renderBulkPreview(proposals) {
+  document.getElementById('gr-bulk-preview-title').textContent =
+    `${proposals.length} golden record proposal(s) ready to submit`;
+  document.getElementById('gr-bulk-preview-tbody').innerHTML = proposals.map((p, i) => {
+    const fields = Object.keys(p.golden_data).length;
+    const hasData = fields > 0;
+    return `<tr style="${i % 2 === 0 ? 'background:#F7F5F9;' : ''}">
+      <td style="padding:7px 12px;font-weight:600;">${escHtml(p.case_name || String(p.case_id))}</td>
+      <td style="padding:7px 12px;color:#667;">${fields} field(s) filled</td>
+      <td style="padding:7px 12px;">${hasData
+        ? '<span style="color:#065f46;font-weight:700;">Ready</span>'
+        : '<span style="color:#c0392b;font-weight:700;">Empty — skipped</span>'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('gr-bulk-preview').style.display = '';
+  document.getElementById('gr-bulk-submit-btn').disabled = !proposals.some(p => Object.keys(p.golden_data).length > 0);
+}
+
+function cancelBulkPreview() {
+  _bulkProposals = [];
+  document.getElementById('gr-bulk-preview').style.display = 'none';
+}
+
+async function submitBulkProposals() {
+  const toSubmit = _bulkProposals.filter(p => Object.keys(p.golden_data).length > 0);
+  if (toSubmit.length === 0) { grListAlert('Nothing to submit — all golden rows are empty.', true); return; }
+
+  const btn = document.getElementById('gr-bulk-submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  try {
+    const res = await fetch('/api/cases/bulk-proposal', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ proposals: toSubmit.map(p => ({ case_id: p.case_id, golden_data: p.golden_data, notes: p.notes })) }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error || 'Server error');
+    const { results } = await res.json();
+    const ok = results.filter(r => r.status === 'ok').length;
+    const failed = results.filter(r => r.status === 'error');
+
+    cancelBulkPreview();
+    loadGRCases();
+
+    if (failed.length === 0) {
+      grListAlert(`${ok} proposal(s) submitted successfully.`, false);
+    } else {
+      grListAlert(`${ok} submitted, ${failed.length} failed: ${failed.map(f => `Case ${f.case_id}: ${f.error}`).join('; ')}`, true);
+    }
+  } catch (e) {
+    grListAlert(e.message, true);
+    btn.disabled = false; btn.textContent = 'Submit All Proposals';
+  }
+}
+
+// ── Helpers
+function grModalAlert(msg, isErr) {
+  const el = document.getElementById('gr-modal-alert');
+  el.textContent = msg;
+  el.className = 'gr-alert ' + (isErr ? 'err' : 'ok');
+}
+
+function grListAlert(msg, isErr) {
+  const el = document.getElementById('gr-list-alert');
+  el.textContent = msg;
+  el.className = 'gr-alert ' + (isErr ? 'err' : 'ok');
+  setTimeout(() => clearGRAlert('gr-list-alert'), 4000);
+}
+
+function grDetailAlert(msg, isErr) {
+  const el = document.getElementById('gr-detail-alert');
+  el.textContent = msg;
+  el.className = 'gr-alert ' + (isErr ? 'err' : 'ok');
+}
+
+function clearGRAlert(id) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = ''; el.className = 'gr-alert'; }
 }
 
 /* ============================================================
