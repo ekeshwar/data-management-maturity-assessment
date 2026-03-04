@@ -863,42 +863,52 @@
 <!-- ─── New Case Modal ─── -->
 <div id="gr-modal" class="gr-modal-overlay">
   <div class="gr-modal-box">
-    <div class="gr-modal-title">New Golden Record Case</div>
+    <div class="gr-modal-title">Bulk Upload — Create Cases from File</div>
     <div id="gr-modal-alert" class="gr-alert"></div>
-    <div class="gr-form-group">
-      <label>Case Name</label>
-      <input type="text" id="gr-case-name" placeholder="e.g. Q1 Customer Dedup" />
-    </div>
+
     <div class="gr-form-group">
       <label>Entity Type</label>
       <input type="text" id="gr-entity-type" placeholder="Customer" value="Customer" />
     </div>
+
     <div class="gr-form-group">
-      <label>Upload CSV of Duplicate Records</label>
+      <label>Upload CSV or Excel file</label>
       <div class="drop-zone" id="gr-drop-zone" onclick="document.getElementById('gr-file-input').click()" style="padding:28px 20px;">
         <div class="drop-zone-icon">&#128196;</div>
-        <h3>Click to select a CSV file</h3>
-        <p>First row = column headers. Each subsequent row = one source record.</p>
+        <h3>Click to select a file</h3>
+        <p>CSV (.csv) or Excel (.xlsx, .xls) &mdash; first row must be column headers.</p>
       </div>
-      <input type="file" id="gr-file-input" accept=".csv" style="display:none;" onchange="grHandleFile(this)" />
+      <input type="file" id="gr-file-input" accept=".csv,.xlsx,.xls" style="display:none;" onchange="grHandleFile(this)" />
     </div>
 
-    <!-- CSV preview + source names -->
-    <div id="gr-csv-preview" style="display:none;">
-      <div style="font-size:0.83rem;font-weight:700;color:#482A7A;margin-bottom:8px;" id="gr-csv-info"></div>
-      <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:8px;margin-bottom:14px;">
-        <table class="preview-table" id="gr-preview-table">
-          <thead id="gr-preview-thead"></thead>
-          <tbody id="gr-preview-tbody"></tbody>
+    <!-- Column selector (shown after file parsed) -->
+    <div id="gr-col-selector" style="display:none;">
+      <div class="gr-form-group">
+        <label>Group ID Column <span style="font-weight:400;color:#667;">— which column identifies the duplicate group?</span></label>
+        <select id="gr-group-col" onchange="grUpdateGroupPreview()" style="width:100%;padding:9px 12px;border:1.5px solid #c8cedc;border-radius:7px;font-size:0.88rem;font-family:inherit;outline:none;background:#fff;">
+          <option value="">-- select a column --</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Group summary table (shown after column selected) -->
+    <div id="gr-group-summary" style="display:none;background:#F7F5F9;border:1px solid #e2e6f0;border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+      <div id="gr-group-summary-text" style="font-size:0.86rem;font-weight:600;color:#482A7A;margin-bottom:8px;"></div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.79rem;">
+          <thead><tr style="background:#EDE5F5;">
+            <th style="padding:6px 10px;text-align:left;color:#482A7A;font-weight:700;">Group</th>
+            <th style="padding:6px 10px;text-align:left;color:#482A7A;font-weight:700;">Case Name</th>
+            <th style="padding:6px 10px;text-align:right;color:#482A7A;font-weight:700;">Records</th>
+          </tr></thead>
+          <tbody id="gr-group-preview-tbody"></tbody>
         </table>
       </div>
-      <div style="font-size:0.82rem;font-weight:600;color:#482A7A;margin-bottom:6px;">Source Names (editable)</div>
-      <div id="gr-source-names"></div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:18px;">
       <button class="btn btn-outline" style="flex:1;" onclick="closeGRModal()">Cancel</button>
-      <button class="btn btn-primary" style="flex:1;" id="gr-modal-submit" onclick="submitNewCase()">Create Case</button>
+      <button class="btn btn-primary" style="flex:1;" id="gr-modal-submit" onclick="submitNewCase()" disabled>Create Cases</button>
     </div>
   </div>
 </div>
@@ -2882,8 +2892,9 @@ function resetDQ() {
 ============================================================ */
 let _grCurrentCase = null;
 let _grParsedHeaders = [];
-let _grParsedRows = [];   // [{source_name, data:{col:val,...}}, ...]
-let _grSelectedValues = {}; // {fieldName: value}
+let _grAllRows = [];        // all parsed row objects {col: val, ...}
+let _grFileName = '';       // file base name (no extension)
+let _grSelectedValues = {}; // {fieldName: value} — used in detail propose panel
 
 function grStatusBadge(status) {
   const cls = { open:'gr-status-open', proposed:'gr-status-proposed', approved:'gr-status-approved', rejected:'gr-status-rejected' }[status] || 'gr-status-open';
@@ -3172,11 +3183,14 @@ function resubmitProposal() {
 // ── Modal
 function openGRModal() {
   _grParsedHeaders = [];
-  _grParsedRows = [];
-  document.getElementById('gr-case-name').value = '';
+  _grAllRows = [];
+  _grFileName = '';
   document.getElementById('gr-entity-type').value = 'Customer';
   document.getElementById('gr-file-input').value = '';
-  document.getElementById('gr-csv-preview').style.display = 'none';
+  document.getElementById('gr-col-selector').style.display = 'none';
+  document.getElementById('gr-group-summary').style.display = 'none';
+  document.getElementById('gr-modal-submit').disabled = true;
+  document.getElementById('gr-modal-submit').textContent = 'Create Cases';
   clearGRAlert('gr-modal-alert');
   document.getElementById('gr-modal').classList.add('open');
 }
@@ -3188,28 +3202,91 @@ function closeGRModal() {
 function grHandleFile(input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const text = e.target.result;
-    parseGRCSV(text);
-  };
-  reader.readAsText(file);
+  _grFileName = file.name.replace(/\.[^.]+$/, '');
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'csv') {
+    const reader = new FileReader();
+    reader.onload = e => parseGRCSV(e.target.result);
+    reader.readAsText(file);
+  } else if (ext === 'xlsx' || ext === 'xls') {
+    const reader = new FileReader();
+    reader.onload = e => parseGRExcel(e.target.result);
+    reader.readAsArrayBuffer(file);
+  } else {
+    grModalAlert('Please upload a .csv, .xlsx, or .xls file.', true);
+  }
 }
 
 function parseGRCSV(text) {
   const lines = text.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 2) {
-    grModalAlert('CSV must have at least a header row and one data row.', true); return;
-  }
+  if (lines.length < 2) { grModalAlert('CSV must have at least a header row and one data row.', true); return; }
   _grParsedHeaders = splitCSVLine(lines[0]);
-  _grParsedRows = [];
+  _grAllRows = [];
   for (let i = 1; i < lines.length; i++) {
     const vals = splitCSVLine(lines[i]);
-    const data = {};
-    _grParsedHeaders.forEach((h, idx) => { data[h] = vals[idx] !== undefined ? vals[idx] : ''; });
-    _grParsedRows.push({ source_name: 'Source ' + i, data });
+    const row = {};
+    _grParsedHeaders.forEach((h, idx) => { row[h] = vals[idx] !== undefined ? vals[idx] : ''; });
+    _grAllRows.push(row);
   }
-  renderGRCSVPreview();
+  grShowColSelector();
+}
+
+function parseGRExcel(arrayBuffer) {
+  try {
+    const wb = XLSX.read(arrayBuffer, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+    if (rows.length === 0) { grModalAlert('Excel sheet appears empty.', true); return; }
+    _grParsedHeaders = Object.keys(rows[0]);
+    _grAllRows = rows.map(r => {
+      const obj = {};
+      _grParsedHeaders.forEach(h => { obj[h] = r[h] !== undefined ? String(r[h]) : ''; });
+      return obj;
+    });
+    grShowColSelector();
+  } catch (e) {
+    grModalAlert('Could not parse Excel file: ' + e.message, true);
+  }
+}
+
+function grShowColSelector() {
+  const sel = document.getElementById('gr-group-col');
+  sel.innerHTML = '<option value="">-- select a column --</option>' +
+    _grParsedHeaders.map(h => `<option value="${escHtml(h)}">${escHtml(h)}</option>`).join('');
+  document.getElementById('gr-col-selector').style.display = '';
+  document.getElementById('gr-group-summary').style.display = 'none';
+  document.getElementById('gr-modal-submit').disabled = true;
+  grModalAlert(`Parsed ${_grAllRows.length} row(s) with ${_grParsedHeaders.length} column(s). Select the Group ID column below.`, false);
+}
+
+function grUpdateGroupPreview() {
+  const groupCol = document.getElementById('gr-group-col').value;
+  if (!groupCol) {
+    document.getElementById('gr-group-summary').style.display = 'none';
+    document.getElementById('gr-modal-submit').disabled = true;
+    return;
+  }
+  const groups = {};
+  _grAllRows.forEach(row => {
+    const gVal = String(row[groupCol] !== undefined ? row[groupCol] : '');
+    if (!groups[gVal]) groups[gVal] = [];
+    groups[gVal].push(row);
+  });
+  const entries = Object.entries(groups);
+  document.getElementById('gr-group-summary-text').textContent =
+    `${entries.length} group(s) found — will create ${entries.length} case(s)`;
+  document.getElementById('gr-group-preview-tbody').innerHTML = entries.map(([gVal, recs]) =>
+    `<tr>
+      <td style="padding:5px 10px;font-weight:600;">${escHtml(gVal)}</td>
+      <td style="padding:5px 10px;color:#667;">${escHtml(_grFileName + ' \u2014 ' + gVal)}</td>
+      <td style="padding:5px 10px;text-align:right;">${recs.length}</td>
+    </tr>`
+  ).join('');
+  document.getElementById('gr-group-summary').style.display = '';
+  const btn = document.getElementById('gr-modal-submit');
+  btn.textContent = `Create ${entries.length} Case${entries.length !== 1 ? 's' : ''}`;
+  btn.disabled = false;
+  clearGRAlert('gr-modal-alert');
 }
 
 function splitCSVLine(line) {
@@ -3230,52 +3307,47 @@ function splitCSVLine(line) {
   return result;
 }
 
-function renderGRCSVPreview() {
-  document.getElementById('gr-csv-info').textContent =
-    `Parsed ${_grParsedRows.length} record(s), ${_grParsedHeaders.length} field(s).`;
-  const thead = document.getElementById('gr-preview-thead');
-  const tbody = document.getElementById('gr-preview-tbody');
-  thead.innerHTML = '<tr>' + _grParsedHeaders.map(h => `<th>${escHtml(h)}</th>`).join('') + '</tr>';
-  tbody.innerHTML = _grParsedRows.slice(0,5).map(r =>
-    '<tr>' + _grParsedHeaders.map(h => `<td>${escHtml(String(r.data[h] != null ? r.data[h] : ''))}</td>`).join('') + '</tr>'
-  ).join('');
-
-  // Source name inputs
-  const snDiv = document.getElementById('gr-source-names');
-  snDiv.innerHTML = _grParsedRows.map((r, i) =>
-    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-      <label style="font-size:0.8rem;color:#667;min-width:70px;">Row ${i+1}:</label>
-      <input type="text" value="${escHtml(r.source_name)}" style="padding:5px 9px;border:1px solid #c8cedc;border-radius:6px;font-size:0.82rem;font-family:inherit;outline:none;width:200px;"
-        oninput="_grParsedRows[${i}].source_name = this.value" />
-    </div>`
-  ).join('');
-
-  document.getElementById('gr-csv-preview').style.display = '';
-  clearGRAlert('gr-modal-alert');
-}
-
 async function submitNewCase() {
-  const name = document.getElementById('gr-case-name').value.trim();
   const entity_type = document.getElementById('gr-entity-type').value.trim() || 'Generic';
-  if (!name) { grModalAlert('Case name is required.', true); return; }
-  if (_grParsedRows.length === 0) { grModalAlert('Please upload a CSV file with at least one record.', true); return; }
+  const groupCol = document.getElementById('gr-group-col').value;
+  if (!groupCol) { grModalAlert('Please select a Group ID column.', true); return; }
+  if (_grAllRows.length === 0) { grModalAlert('Please upload a file first.', true); return; }
+
+  // Build groups
+  const groups = {};
+  _grAllRows.forEach(row => {
+    const gVal = String(row[groupCol] !== undefined ? row[groupCol] : '');
+    if (!groups[gVal]) groups[gVal] = [];
+    groups[gVal].push(row);
+  });
+  const entries = Object.entries(groups);
+  if (entries.length === 0) { grModalAlert('No groups found.', true); return; }
 
   const btn = document.getElementById('gr-modal-submit');
   btn.disabled = true;
-  try {
-    const records = _grParsedRows.map(r => ({ source_name: r.source_name, data: r.data }));
-    const res = await fetch('/api/cases', {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({ name, entity_type, records }),
-    });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Error'); }
+  let created = 0, failed = 0;
+
+  for (const [gVal, rows] of entries) {
+    btn.textContent = `Creating ${created + 1} of ${entries.length}…`;
+    const caseName = _grFileName + ' \u2014 ' + gVal;
+    const records = rows.map((row, i) => ({ source_name: 'Record ' + (i + 1), data: row }));
+    try {
+      const res = await fetch('/api/cases', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ name: caseName, entity_type, records }),
+      });
+      if (res.ok) { created++; } else { failed++; }
+    } catch { failed++; }
+  }
+
+  btn.disabled = false;
+  if (failed === 0) {
     closeGRModal();
     loadGRCases();
-  } catch (e) {
-    grModalAlert(e.message, true);
-  } finally {
-    btn.disabled = false;
+  } else {
+    btn.textContent = `Create ${entries.length} Case${entries.length !== 1 ? 's' : ''}`;
+    grModalAlert(`${created} case(s) created, ${failed} failed. Please retry.`, true);
   }
 }
 
