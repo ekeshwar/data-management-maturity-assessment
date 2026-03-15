@@ -66,3 +66,30 @@ CREATE TABLE IF NOT EXISTS gr_proposals (
   proposed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   reviewed_at  TIMESTAMPTZ
 );
+
+-- Assessment Persistence
+
+CREATE TABLE IF NOT EXISTS dama_assessments (
+  id               SERIAL PRIMARY KEY,
+  name             VARCHAR(255) NOT NULL,
+  client_name      VARCHAR(255) NOT NULL,
+  created_by       INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  dimension_config JSONB NOT NULL,
+  scores           JSONB NOT NULL,
+  overall_score    NUMERIC(4,2),
+  maturity_level   VARCHAR(50),
+  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  updated_at       TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS dq_assessments (
+  id               SERIAL PRIMARY KEY,
+  name             VARCHAR(255) NOT NULL,
+  file_name        VARCHAR(255),
+  created_by       INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  configured_rules JSONB NOT NULL,
+  results          JSONB NOT NULL,
+  total_rows       INTEGER,
+  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  updated_at       TIMESTAMPTZ DEFAULT NOW()
+);
