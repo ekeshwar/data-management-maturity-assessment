@@ -281,6 +281,15 @@
     .dim-disabled-msg strong { display: block; margin-bottom: 6px; font-size: 1rem; color: #482A7A; }
     .dim-disabled-msg span { font-size: 0.84rem; }
 
+    /* Assessment History modals */
+    .history-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .history-table th { background: linear-gradient(90deg,#482A7A,#B31F7E); color: #fff; padding: 9px 12px; text-align: left; font-size: 0.79rem; white-space: nowrap; }
+    .history-table td { padding: 8px 12px; border-bottom: 1px solid #eaecf2; vertical-align: middle; }
+    .history-table tr:last-child td { border-bottom: none; }
+    .history-table tr:nth-child(even) { background: #F7F5F9; }
+    .save-toast { position: fixed; bottom: 28px; right: 28px; background: #27a355; color: #fff; padding: 12px 22px; border-radius: 10px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.22); z-index: 2000; display: none; opacity: 0; transition: opacity 0.25s; }
+    .save-toast.visible { display: block; opacity: 1; }
+
     /* RESPONSIVE */
     @media (max-width: 900px) { .results-grid { grid-template-columns: 1fr; } .dama-sidebar { width: 190px; } }
     @media (max-width: 700px) {
@@ -389,6 +398,11 @@
   <!-- ═══════════════════════ DAMA PANEL ═══════════════════════ -->
   <div class="tab-panel active" id="panel-dama">
 
+    <!-- DAMA toolbar -->
+    <div style="display:flex;justify-content:flex-end;padding:12px 20px 0;gap:8px;">
+      <button class="btn btn-outline btn-sm" onclick="loadDamaHistory()">&#128196; Assessment History</button>
+    </div>
+
     <!-- Mandatory Client Name -->
     <div class="client-name-wrap" id="dama-client-wrap">
       <label for="client-name-input"><span class="required-star">★</span> Client / Organisation Name:</label>
@@ -448,6 +462,7 @@
       <div class="dama-actions">
         <button class="btn btn-outline" onclick="retakeDAMA()">← Retake Assessment</button>
         <button class="btn btn-primary" onclick="exportDamaPDF()" id="pdf-export-btn">Export PDF Report</button>
+        <button class="btn btn-success" onclick="saveDamaAssessment()" id="dama-save-btn">&#128190; Save Assessment</button>
       </div>
       <div class="results-grid">
         <div class="radar-card">
@@ -471,6 +486,11 @@
 
   <!-- ═══════════════════════ DQ PANEL ═══════════════════════ -->
   <div class="tab-panel" id="panel-dq">
+
+    <!-- DQ toolbar -->
+    <div style="display:flex;justify-content:flex-end;padding:0 0 10px;gap:8px;">
+      <button class="btn btn-outline btn-sm" onclick="loadDqHistory()">&#128196; Assessment History</button>
+    </div>
 
     <!-- Step bar -->
     <div class="step-bar">
@@ -694,6 +714,7 @@
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           <button class="btn btn-primary" onclick="downloadExcel()">&#11015; Download Excel Report</button>
           <button class="btn btn-success" onclick="exportDQPDF()" id="dq-pdf-btn">&#11015; Export PDF Report</button>
+          <button class="btn btn-success" onclick="saveDqAssessment()" id="dq-save-btn">&#128190; Save Assessment</button>
           <button class="btn btn-outline" onclick="resetDQ()">New Assessment</button>
         </div>
       </div>
@@ -935,6 +956,49 @@
     </div>
   </div>
 </div>
+
+<!-- ─── DAMA History Modal ─── -->
+<div id="dama-history-modal" class="gr-modal-overlay">
+  <div class="gr-modal-box" style="max-width:760px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <h3 class="gr-modal-title" style="margin-bottom:0;">DAMA Assessment History</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeDamaHistory()">Close</button>
+    </div>
+    <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:8px;">
+      <table class="history-table">
+        <thead>
+          <tr><th>Name</th><th>Client</th><th>Date</th><th>Score</th><th>Level</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="dama-history-tbody">
+          <tr><td colspan="6" style="padding:20px;text-align:center;color:#8a94a8;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ─── DQ History Modal ─── -->
+<div id="dq-history-modal" class="gr-modal-overlay">
+  <div class="gr-modal-box" style="max-width:760px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <h3 class="gr-modal-title" style="margin-bottom:0;">DQ Assessment History</h3>
+      <button class="btn btn-outline btn-sm" onclick="closeDqHistory()">Close</button>
+    </div>
+    <div style="overflow-x:auto;border:1px solid #e2e6f0;border-radius:8px;">
+      <table class="history-table">
+        <thead>
+          <tr><th>Name</th><th>File</th><th>Date</th><th>Rules</th><th>Pass Rate</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="dq-history-tbody">
+          <tr><td colspan="6" style="padding:20px;text-align:center;color:#8a94a8;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Save Toast ─── -->
+<div id="save-toast" class="save-toast"></div>
 
 <!-- ─── Invite User Modal ─── -->
 <div id="invite-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">
@@ -1631,18 +1695,25 @@ function submitDAMA() {
   const resultsEl = document.getElementById('dama-results');
   resultsEl.classList.add('visible');
 
-  // 6. Overall score card
+  // 6–9. Render results panel
+  _renderDAMAResults(scores, enabledIndices, clientName, null);
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── Shared results renderer (used by submitDAMA + restoreDamaAssessment) ── */
+function _renderDAMAResults(scores, enabledIndices, clientName, dateStr) {
+  const overallScore = scores.reduce((a, b) => a + b, 0) / scores.length;
   const overallLevel = getLevel(overallScore);
+
   document.getElementById('dama-overall-num').textContent = overallScore.toFixed(2);
   const badge = document.getElementById('dama-overall-badge');
   badge.textContent = overallLevel.label;
   badge.style.background = overallLevel.color;
   document.getElementById('dama-overall-rec').textContent = overallLevel.rec;
   document.getElementById('dama-display-org').textContent = clientName;
-  document.getElementById('dama-display-date').textContent =
+  document.getElementById('dama-display-date').textContent = dateStr ||
     new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  // 7. Dimension table (enabled dims only)
   const tbody = document.getElementById('dama-dim-tbody');
   tbody.innerHTML = '';
   enabledIndices.forEach((dimIdx, si) => {
@@ -1659,14 +1730,12 @@ function submitDAMA() {
     tbody.appendChild(tr);
   });
 
-  // Animate mini bars
   requestAnimationFrame(() => requestAnimationFrame(() => {
     document.querySelectorAll('.mini-bar-fill').forEach(bar => {
       bar.style.width = bar.dataset.pct + '%';
     });
   }));
 
-  // 8. Recommendations — bottom 3 enabled dims by score
   const ranked = scores.map((s, si) => ({ score: s, dim: dimensionConfig[enabledIndices[si]] }))
     .sort((a, b) => a.score - b.score);
   const recsEl = document.getElementById('dama-recommendations');
@@ -1680,9 +1749,7 @@ function submitDAMA() {
     recsEl.appendChild(div);
   });
 
-  // 9. Render radar (enabled dims only)
   renderRadarChart(scores, enabledIndices.map(i => dimensionConfig[i]));
-  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function retakeDAMA() {
@@ -2563,8 +2630,10 @@ async function runAssessment() {
    DQ: RESULTS
 ============================================================ */
 function renderSummaryTable() {
+  const _totalRows = parsedData.length > 0 ? parsedData.length
+    : (assessmentResults.length > 0 ? assessmentResults[0].total : 0);
   document.getElementById('result-file-info').textContent =
-    `File: ${currentFileName}  —  ${parsedData.length.toLocaleString()} records`;
+    `File: ${currentFileName}  —  ${_totalRows.toLocaleString()} records`;
 
   const passCount = assessmentResults.filter(r => r.exceptions.length === 0).length;
   const failCount = assessmentResults.length - passCount;
@@ -3555,6 +3624,265 @@ function grDetailAlert(msg, isErr) {
 function clearGRAlert(id) {
   const el = document.getElementById(id);
   if (el) { el.textContent = ''; el.className = 'gr-alert'; }
+}
+
+/* ============================================================
+   ASSESSMENT PERSISTENCE — SHARED
+============================================================ */
+function showSaveToast(msg) {
+  const toast = document.getElementById('save-toast');
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  setTimeout(() => toast.classList.remove('visible'), 3000);
+}
+
+/* ============================================================
+   ASSESSMENT PERSISTENCE — DAMA
+============================================================ */
+async function saveDamaAssessment() {
+  if (!lastAssessmentData) { alert('No assessment to save. Please run the assessment first.'); return; }
+  const btn = document.getElementById('dama-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try {
+    const { scores, enabledIndices, clientName } = lastAssessmentData;
+    const overallScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const maturityLevel = getLevel(overallScore).label;
+    const today = new Date().toISOString().split('T')[0];
+
+    // Attach per-question scores from DOM radio inputs to the config snapshot
+    const configWithScores = dimensionConfig.map((dim) => {
+      const questionScores = dim.enabled ? dim.questions.map((_, qi) => {
+        const sel = document.querySelector(`input[name="${dim.id}_q${qi}"]:checked`);
+        return sel ? parseInt(sel.value, 10) : null;
+      }) : null;
+      return { ...dim, questionScores };
+    });
+
+    const res = await fetch('/api/assessments/dama', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        name: `${clientName} — ${today}`,
+        client_name: clientName,
+        dimension_config: configWithScores,
+        scores,
+        enabled_indices: enabledIndices,
+        overall_score: parseFloat(overallScore.toFixed(2)),
+        maturity_level: maturityLevel,
+      }),
+    });
+    if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Save failed'); }
+    showSaveToast('DAMA assessment saved!');
+  } catch (e) {
+    alert('Failed to save: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '\u{1F4BE} Save Assessment';
+  }
+}
+
+async function loadDamaHistory() {
+  const modal = document.getElementById('dama-history-modal');
+  const tbody = document.getElementById('dama-history-tbody');
+  tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:#8a94a8;">Loading…</td></tr>';
+  modal.classList.add('open');
+  try {
+    const res = await fetch('/api/assessments/dama', { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    const { assessments } = await res.json();
+    if (!assessments.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:#8a94a8;">No saved assessments yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = assessments.map((a, i) => `
+      <tr style="${i % 2 === 0 ? 'background:#F7F5F9;' : ''}">
+        <td style="padding:8px 12px;font-weight:600;">${escHtml(a.name)}</td>
+        <td style="padding:8px 12px;">${escHtml(a.client_name)}</td>
+        <td style="padding:8px 12px;">${new Date(a.created_at).toLocaleDateString()}</td>
+        <td style="padding:8px 12px;"><strong>${a.overall_score != null ? parseFloat(a.overall_score).toFixed(2) : '—'}</strong></td>
+        <td style="padding:8px 12px;">${escHtml(a.maturity_level || '—')}</td>
+        <td style="padding:8px 12px;">
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-primary btn-sm" onclick="loadDamaAssessmentById(${a.id})">Load</button>
+            <button class="btn btn-sm" style="background:#fdecea;color:#c0392b;" onclick="deleteDamaAssessment(${a.id}, this)">Delete</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:#e74c3c;">Failed to load history.</td></tr>';
+  }
+}
+
+function closeDamaHistory() {
+  document.getElementById('dama-history-modal').classList.remove('open');
+}
+
+async function loadDamaAssessmentById(id) {
+  try {
+    const res = await fetch(`/api/assessments/dama/${id}`, { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    const { assessment } = await res.json();
+    restoreDamaAssessment(assessment);
+  } catch {
+    alert('Failed to load assessment.');
+  }
+}
+
+function restoreDamaAssessment(saved) {
+  dimensionConfig = saved.dimension_config;
+  const { scores, enabledIndices } = saved.scores;
+  lastAssessmentData = { scores, enabledIndices, clientName: saved.client_name };
+
+  // Re-build sidebar with restored config (needed for _renderDAMAResults label lookups)
+  initDAMA();
+
+  // Show results, hide survey
+  document.getElementById('dama-survey-layout').style.display = 'none';
+  document.getElementById('dama-client-wrap').style.display = 'none';
+  document.getElementById('client-name-input').value = saved.client_name;
+  const resultsEl = document.getElementById('dama-results');
+  resultsEl.classList.add('visible');
+
+  const dateStr = new Date(saved.created_at).toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
+  _renderDAMAResults(scores, enabledIndices, saved.client_name, dateStr);
+
+  closeDamaHistory();
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function deleteDamaAssessment(id, btn) {
+  if (!confirm('Delete this assessment? This cannot be undone.')) return;
+  btn.disabled = true;
+  try {
+    const res = await fetch(`/api/assessments/dama/${id}`, { method: 'DELETE', headers: authHeaders() });
+    if (!res.ok) throw new Error((await res.json()).error);
+    btn.closest('tr').remove();
+  } catch (e) {
+    alert(e.message || 'Failed to delete.');
+    btn.disabled = false;
+  }
+}
+
+/* ============================================================
+   ASSESSMENT PERSISTENCE — DQ
+============================================================ */
+async function saveDqAssessment() {
+  if (!assessmentResults.length) { alert('No assessment to save. Please run an assessment first.'); return; }
+  const btn = document.getElementById('dq-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const baseName = currentFileName.split('.').slice(0, -1).join('.') || currentFileName || 'assessment';
+    const totalRows = parsedData.length > 0 ? parsedData.length
+      : (assessmentResults.length > 0 ? assessmentResults[0].total : 0);
+
+    const res = await fetch('/api/assessments/dq', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        name: `${baseName} — ${today}`,
+        file_name: currentFileName,
+        configured_rules: configuredRules,
+        results: assessmentResults,
+        total_rows: totalRows,
+      }),
+    });
+    if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Save failed'); }
+    showSaveToast('DQ assessment saved!');
+  } catch (e) {
+    alert('Failed to save: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '\u{1F4BE} Save Assessment';
+  }
+}
+
+async function loadDqHistory() {
+  const modal = document.getElementById('dq-history-modal');
+  const tbody = document.getElementById('dq-history-tbody');
+  tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:#8a94a8;">Loading…</td></tr>';
+  modal.classList.add('open');
+  try {
+    const res = await fetch('/api/assessments/dq', { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    const { assessments } = await res.json();
+    if (!assessments.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:#8a94a8;">No saved assessments yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = assessments.map((a, i) => {
+      const results = a.results || [];
+      const passCount = results.filter(r => r.exceptions && r.exceptions.length === 0).length;
+      const passRate = results.length > 0 ? Math.round(passCount / results.length * 100) + '%' : '—';
+      return `<tr style="${i % 2 === 0 ? 'background:#F7F5F9;' : ''}">
+        <td style="padding:8px 12px;font-weight:600;">${escHtml(a.name)}</td>
+        <td style="padding:8px 12px;">${escHtml(a.file_name || '—')}</td>
+        <td style="padding:8px 12px;">${new Date(a.created_at).toLocaleDateString()}</td>
+        <td style="padding:8px 12px;">${(a.configured_rules || []).length} rules</td>
+        <td style="padding:8px 12px;">${passRate}</td>
+        <td style="padding:8px 12px;">
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-primary btn-sm" onclick="loadDqAssessmentById(${a.id})">Load</button>
+            <button class="btn btn-sm" style="background:#fdecea;color:#c0392b;" onclick="deleteDqAssessment(${a.id}, this)">Delete</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;text-align:center;color:#e74c3c;">Failed to load history.</td></tr>';
+  }
+}
+
+function closeDqHistory() {
+  document.getElementById('dq-history-modal').classList.remove('open');
+}
+
+async function loadDqAssessmentById(id) {
+  try {
+    const res = await fetch(`/api/assessments/dq/${id}`, { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    const { assessment } = await res.json();
+    restoreDqAssessment(assessment);
+  } catch {
+    alert('Failed to load assessment.');
+  }
+}
+
+function restoreDqAssessment(saved) {
+  configuredRules = saved.configured_rules;
+  assessmentResults = saved.results;
+  currentFileName = saved.file_name || 'Restored Assessment';
+  parsedData = []; // raw data not stored
+
+  renderRulesList();
+  closeDqHistory();
+
+  // Switch to DQ tab if not active
+  if (!document.getElementById('panel-dq').classList.contains('active')) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-dq').classList.add('active');
+    document.querySelector('.tab-btn[onclick*="\'dq\'"]').classList.add('active');
+  }
+
+  showStep(4);
+  renderSummaryTable();
+  document.getElementById('dq-step-4').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function deleteDqAssessment(id, btn) {
+  if (!confirm('Delete this assessment? This cannot be undone.')) return;
+  btn.disabled = true;
+  try {
+    const res = await fetch(`/api/assessments/dq/${id}`, { method: 'DELETE', headers: authHeaders() });
+    if (!res.ok) throw new Error((await res.json()).error);
+    btn.closest('tr').remove();
+  } catch (e) {
+    alert(e.message || 'Failed to delete.');
+    btn.disabled = false;
+  }
 }
 
 /* ============================================================
