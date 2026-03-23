@@ -173,7 +173,11 @@
     .preview-table td { padding: 6px 11px; border-bottom: 1px solid #eaecf2; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
     .preview-table tr:last-child td { border-bottom: none; }
     .preview-table tr:nth-child(even) { background: #F7F5F9; }
-    .step1-nav { display: flex; justify-content: flex-end; margin-top: 14px; }
+    .step1-nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+    .ai-banner { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(90deg, #f3eeff, #fce8f5); border: 1px solid #c9a8e8; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 0.85rem; color: #4a206e; }
+    .ai-banner-close { background: none; border: none; cursor: pointer; font-size: 1rem; color: #7a5a9e; line-height: 1; padding: 0 4px; }
+    .ai-suggest-spinner { display: none; width: 14px; height: 14px; border: 2px solid #c9a8e8; border-top-color: #7c3ac9; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Configure rules */
     .rule-layout { display: flex; gap: 18px; min-height: 480px; }
@@ -529,12 +533,19 @@
         </div>
       </div>
       <div class="step1-nav">
+        <button class="btn btn-outline" id="ai-suggest-btn" onclick="suggestRulesWithAI()" disabled>
+          <span class="ai-suggest-spinner" id="ai-spinner"></span>✨ Suggest Rules with AI
+        </button>
         <button class="btn btn-primary" onclick="goToStep(2)" id="step1-next-btn" disabled>Next: Configure Rules →</button>
       </div>
     </div>
 
     <!-- Step 2: Configure Rules -->
     <div id="dq-step-2" class="dq-step">
+      <div id="ai-suggestion-banner" style="display:none;" class="ai-banner">
+        <span id="ai-banner-text"></span>
+        <button class="ai-banner-close" onclick="document.getElementById('ai-suggestion-banner').style.display='none'">✕</button>
+      </div>
       <div class="rule-layout">
         <div class="col-list">
           <div class="col-list-header">Columns</div>
@@ -2178,6 +2189,47 @@ function showStep(n) {
 }
 
 /* ============================================================
+   DQ: AI RULE SUGGESTION
+============================================================ */
+async function suggestRulesWithAI() {
+  const btn = document.getElementById('ai-suggest-btn');
+  const spinner = document.getElementById('ai-spinner');
+  btn.disabled = true;
+  spinner.style.display = 'inline-block';
+  btn.childNodes[btn.childNodes.length - 1].textContent = '✨ Analysing data…';
+  try {
+    const payload = { columns, sampleRows: parsedData.slice(0, 20) };
+    const res = await fetch('/api/ai/suggest-rules', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('edm_token'),
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'AI suggestion failed');
+    const suggested = data.rules;
+    suggested.forEach(rule => {
+      rule.id = 'rule-' + (ruleIdCounter++);
+      configuredRules.push(rule);
+    });
+    renderRulesList();
+    const banner = document.getElementById('ai-suggestion-banner');
+    document.getElementById('ai-banner-text').textContent =
+      `✨ ${suggested.length} rule${suggested.length !== 1 ? 's' : ''} suggested by AI — review and adjust before running`;
+    banner.style.display = 'flex';
+    goToStep(2);
+  } catch (err) {
+    alert('AI suggestion failed: ' + err.message);
+    btn.disabled = false;
+  } finally {
+    spinner.style.display = 'none';
+    btn.childNodes[btn.childNodes.length - 1].textContent = '✨ Suggest Rules with AI';
+  }
+}
+
+/* ============================================================
    DQ: FILE UPLOAD
 ============================================================ */
 function handleDrop(e) {
@@ -2214,6 +2266,7 @@ function processFile(file) {
       document.getElementById('file-info-text').textContent =
         `${file.name} — ${data.length.toLocaleString()} rows, ${columns.length} columns loaded`;
       document.getElementById('step1-next-btn').disabled = false;
+      document.getElementById('ai-suggest-btn').disabled = false;
       document.getElementById('drop-zone').style.display = 'none';
     } catch (err) {
       alert('Error reading file: ' + err.message);
@@ -2964,6 +3017,8 @@ function resetDQ() {
   document.getElementById('preview-wrap').classList.remove('visible');
   document.getElementById('drop-zone').style.display = '';
   document.getElementById('step1-next-btn').disabled = true;
+  document.getElementById('ai-suggest-btn').disabled = true;
+  document.getElementById('ai-suggestion-banner').style.display = 'none';
   document.getElementById('file-input').value = '';
   document.getElementById('col-list').innerHTML = '';
   renderRulesList();

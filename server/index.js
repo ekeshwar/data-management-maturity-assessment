@@ -39,6 +39,7 @@ app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/cases', caseRoutes);
 app.use('/api/assessments', assessmentRoutes);
+app.use('/api/ai', require('./routes/ai'));
 
 // SPA fallback — serve index.html for unknown paths
 app.get('*', (req, res) => {
